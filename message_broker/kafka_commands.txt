@@ -1,0 +1,10 @@
+# we can run the standard config for now, but if we need more control, we can look it up here: https://kafka.apache.org/documentation/#brokerconfigs
+
+
+cd ~/kafka_2.13-3.1.0/
+bash bin/zookeeper-server-start.sh config/zookeeper.properties
+bash bin/kafka-server-start.sh config/server.properties
+bash bin/kafka-topics.sh --create --topic SeaIceExtent --bootstrap-server localhost:9092
+
+# just in case
+# bash bin/kafka-topics.sh --delete --topic mytopic --bootstrap-server localhost:9092
