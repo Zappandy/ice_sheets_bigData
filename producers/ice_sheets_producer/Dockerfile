@@ -1,0 +1,14 @@
+FROM python:3.8
+
+WORKDIR /usr/app
+
+ADD ./requirements.txt ./
+RUN pip install -r requirements.txt
+RUN mkdir ./data
+# downloading data when building the container is janky. We should probably download it when starting the producer
+# having the data ready is faster for debugging than downloading everytime
+RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/south/daily/data/ -P ./data
+RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/north/daily/data/ -P ./data
+ADD ./ ./
+
+CMD ["python3", "-u", "send_data.py", "--dataset_name", "SeaIceExtent", "--input_dir", "./data"]

@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  icesheets:
+    container_name: python
+    build: .
+    environment:
+      KAFKA_BROKER_URL: broker:9092
+      TOPIC_NAME: "${WEATHER_TOPIC}"
+      SLEEP_TIME: ${WEATHER_SLEEP_TIME}
+
+networks:
+  default:
+    external:
+      name: kafka-network
