@@ -1,0 +1,18 @@
+FROM confluentinc/cp-kafka-connect-base:5.3.0
+
+RUN apt-get update -y \
+    && apt-get install unzip --force-yes \
+    && curl -O -L "https://d1i4a15mxbxib1.cloudfront.net/api/plugins/datastax/kafka-connect-cassandra-sink/versions/1.4.0/datastax-kafka-connect-cassandra-sink-1.4.0.zip" \
+    && mkdir datastax-connector \
+    && unzip datastax-kafka-connect-cassandra-sink-1.4.0.zip \
+    && mv datastax-kafka-connect-cassandra-sink-1.4.0/lib/* datastax-connector/kafka-connect-cassandra.jar
+
+ENV CONNECT_PLUGIN_PATH="/usr/share/java,/datastax-connector/kafka-connect-cassandra.jar"
+
+WORKDIR /usr/app
+
+COPY connect/ .
+RUN chmod +x *.sh
+
+CMD [ "/bin/bash", "-c", "echo \"Launching Kafka Connect worker\" & \
+        /etc/confluent/docker/run & /usr/app/start-and-wait.sh"]
