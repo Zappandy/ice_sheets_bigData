@@ -1,9 +1,12 @@
 import json
 import argparse
 import pandas as pd
+import os
 from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 
+KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
+TOPIC_NAME = os.environ.get("TOPIC_NAME")
 
 def connect_to_kafka(server):
     producer = KafkaProducer(bootstrap_servers=server,
@@ -42,8 +45,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Data streaming utility for sending climate datasets to kafka")
     parser.add_argument("-ds", "--dataset_name", help="the name of the dataset to load")
     parser.add_argument("-d", "--input_dir", help="directory to where to find the data")
-    parser.add_argument("-t", "--topic", help="kafka topic to stream the data to")
-    parser.add_argument("-s", "--server", help="kafka server to stream the data to")
+    # parser.add_argument("-t", "--topic", help="kafka topic to stream the data to")
+    # parser.add_argument("-s", "--server", help="kafka server to stream the data to")
     parser.add_argument("-r", "--rate", help="rate at which the events are sent. Events per second")
     #TODO add arguments for sending fast, slow, k at a time, interactive, shuffled or ordered...
 
@@ -51,6 +54,8 @@ if __name__ == "__main__":
 
     key = None
     df_data = None
+    topic = TOPIC_NAME
+    server = KAFKA_BROKER_URL
 
     if args.dataset_name == "SeaIceExtent":
         key = "Hemisphere"

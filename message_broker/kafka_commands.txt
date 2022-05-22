@@ -8,3 +8,9 @@ bash bin/kafka-topics.sh --create --topic SeaIceExtent --bootstrap-server localh
 
 # just in case
 # bash bin/kafka-topics.sh --delete --topic mytopic --bootstrap-server localhost:9092
+
+
+# consumer
+
+bash bin/kafka-console-consumer --topic mytopic --bootstrap-server localhost:9092 
+
