@@ -1,0 +1,20 @@
+version: '3'
+
+services: 
+  cassandradb:
+    container_name: cassandra
+    image: bootstrapcassandra
+    #image: cassandra  # https://medium.com/@michaeljpr/five-minute-guide-getting-started-with-cassandra-on-docker-4ef69c710d84
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 7000:7000
+      - 9042:9042
+    volumes:
+      - $PWD/cassandra/data:/var/lib/cassandra
+
+networks: 
+  default:
+    external:
+      name: cassandra-network
