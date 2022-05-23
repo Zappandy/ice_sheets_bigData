@@ -75,6 +75,7 @@ class IceSheetsProducer:
         go = True
         pause = False
         print("starting streaming messages...")
+        i = 0
         while go and self.has_next():
             elm = self.next()
             # TODO: add control listener here. Listen to kafka control topic
@@ -86,10 +87,10 @@ class IceSheetsProducer:
             if pause:
                 continue
             """
-            print(elm)
-            print(self.topic)
             self.kafka_producer.send(topic=self.topic, value=elm, key=elm[self.key])
-
+            i += 1
+            if i % 10000 == 0:
+                print(f"sent messages: {i}")
 
 
 if __name__ == "__main__":

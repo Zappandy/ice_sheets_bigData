@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  difference_processor:
+    container_name: difference_processor
+    build: .
+    environment:
+      KAFKA_BROKER_URL: broker:9092
+      # how long to wait for messages in milliseconds
+      LISTENER_TIMEOUT: 60000
+      LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
+
+networks:
+  default:
+    external:
+      name: kafka-network
