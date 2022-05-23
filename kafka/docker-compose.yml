@@ -32,7 +32,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_MESSAGE_MAX_BYTES: 2000000
       # Create topic, with 1 partition, 1 replica
-      KAFKA_CREATE_TOPICS: "${ICE_SHEET_TOPIC}:1:1
+      KAFKA_CREATE_TOPICS: "${ICE_SHEET_TOPIC}:1:1"
       # ,${WEATHER_TOPIC}:1:1,${TWITTER_SINK_TOPIC}:1:1"
 
   kafka_manager:
