@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 import pandas as pd
 from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
@@ -53,18 +54,23 @@ class IceSheetsProducer:
         return self.remaining_ind > 0
 
     def get_kafka_producer(self):
-        producer = KafkaProducer(bootstrap_servers=self.server,
-                                 value_serializer=lambda x: json.dumps(x).encode('utf-8'),
-                                 key_serializer=lambda s: s.encode('utf-8'))
-        return producer
+        prod = KafkaProducer(bootstrap_servers=self.server,
+                             value_serializer=lambda x: json.dumps(x).encode('utf-8'),
+                             key_serializer=lambda s: s.encode('utf-8'))
+        return prod
 
     def streaming_loop(self):
         go = True
         while go and self.has_next():
             elm = self.next()
-            self.send(topic=self.topic, value=elm.to_json(), key=elm[self.key])
+            self.kafka_producer.send(topic=self.topic, value=elm.to_json(), key=elm[self.key])
             # TODO: add control listener here. Listen to kafka control topic
 
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Data streaming utility for sending climate datasets to kafka")
+    parser.add_argument("-d", "--input_dir", help="directory to where to find the data")
 
+    args = parser.parse_args()
+
+    producer = IceSheetsProducer(args.input_dir)
+    producer.streaming_loop()
