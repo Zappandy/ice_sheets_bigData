@@ -11,4 +11,5 @@ RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02
 RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/north/daily/data/ -P ./data
 ADD ./ ./
 
-CMD ["python3", "-u", "send_data.py", "--dataset_name", "SeaIceExtent", "--input_dir", "./data"]
+# CMD ["python3", "-u", "send_data.py", "--dataset_name", "SeaIceExtent", "--input_dir", "./data"]
+CMD ["python3", "-u", "IceSheetsProducer.py", "--input_dir", "./data"]
