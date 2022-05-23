@@ -32,8 +32,30 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_MESSAGE_MAX_BYTES: 2000000
       # Create topic, with 1 partition, 1 replica
-      KAFKA_CREATE_TOPICS: "${ICE_SHEET_TOPIC}:1:1"
+      # KAFKA_CREATE_TOPICS: "${ICE_SHEET_TOPIC}:1:1"
+      #
       # ,${WEATHER_TOPIC}:1:1,${TWITTER_SINK_TOPIC}:1:1"
+
+  init-kafka:
+      image: confluentinc/cp-kafka:6.1.1
+      depends_on:
+        - broker
+      entrypoint: [ '/bin/sh', '-c' ]
+      command: |
+        "
+        # blocks until kafka is reachable
+        kafka-topics --bootstrap-server broker:9092 --list
+  
+        echo -e 'Creating kafka topics'
+        kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic $ICE_SHEET_TOPIC --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic $ICE_SHEET_DIFF_TOPIC --replication-factor 1 --partitions 1
+  
+        echo -e 'Successfully created the following topics:'
+        kafka-topics --bootstrap-server broker:9092 --list
+        "
+      networks:
+        - default
+
 
   kafka_manager:
     image: hlebalbau/kafka-manager:stable

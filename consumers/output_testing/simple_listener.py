@@ -3,7 +3,7 @@ import json
 from kafka import KafkaConsumer
 
 KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
-LISTEN_TO_TOPICS = os.environ.get("LISTEN_TO_TOPICS").strip('"')
+LISTEN_TO_TOPICS = os.environ.get("LISTEN_TO_TOPICS")
 LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
 

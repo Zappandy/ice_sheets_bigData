@@ -9,7 +9,7 @@ services:
       KAFKA_BROKER_URL: broker:9092
       # how long to wait for messages in milliseconds
       LISTENER_TIMEOUT: 60000
-      LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
+      LISTEN_TO_TOPICS: ${ICE_SHEET_DIFF_TOPIC}
 
 networks:
   default:

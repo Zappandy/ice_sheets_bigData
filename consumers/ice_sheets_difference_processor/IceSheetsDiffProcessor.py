@@ -22,7 +22,7 @@ class IceSheetsDiffProcessor:
     def get_kafka_consumer(self):
         print("connecting consumer to kafka broker")
         cons = KafkaConsumer(self.listen_to_topics, group_id="debug",
-                             bootstrap_servers=[KAFKA_BROKER_URL],
+                             bootstrap_servers=[self.server],
                              consumer_timeout_ms=LISTENER_TIMEOUT,
                              value_deserializer=lambda m: json.loads(m.decode('utf-8')))
         print("consumer connected")
@@ -58,14 +58,16 @@ class IceSheetsDiffProcessor:
                 cur_val = cur_elm["Extent"]
                 if cur_elm[self.key] == "S":
                     diff = cur_val - prev_s
+                    prev_s = cur_val
                 elif cur_elm[self.key] == "N":
                     diff = cur_val - prev_n
+                    prev_n = cur_val
                 else:
-                    diff = None
+                    diff = 0 # should be NaN or missing value
 
                 cur_elm["Difference"] = diff
                 print("sending...")
-                self.producer.send(topic=self.topic, value=cur_elm, key=cur_elm[self.key])
+                self.producer.send(topic="icesheetsdiff", value=cur_elm, key=cur_elm[self.key])
                 print(cur_elm)
 
 
