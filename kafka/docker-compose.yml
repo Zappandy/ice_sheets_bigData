@@ -3,7 +3,7 @@ version: "3"
 services:
 
   zookeeper:
-    image: zookeeper
+          image: confluentinc/cp-zookeeper:latest
     restart: always
     container_name: zookeeper
     hostname: zookeeper
@@ -16,7 +16,7 @@ services:
 
   broker:
     container_name: broker
-    image: wurstmeister/kafka
+    image: confluentinc/cp-kafka:latest
     ports:
       - "9092:9092"
     networks:
@@ -73,11 +73,12 @@ services:
       KAFKA_MANAGER_PASSWORD: smellycat
     command: -Dpidfile.path=/dev/null
   connect:
+    image: datastax-connect:latest
     build:
       context: .
       dockerfile: Dockerfile-connect
-    hostname: kafka-connect
-    container_name: kafka-connect
+      hostname: datastax-connect
+      container_name: datastax-connect
     depends_on:
       - zookeeper
       - broker
@@ -88,9 +89,9 @@ services:
       - secondary
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:9092'
-      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_ADVERTISED_HOST_NAME: datastax-connect
       CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: kafka-connect-group
+      CONNECT_GROUP_ID: datastax-connect-group
       CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
@@ -104,6 +105,12 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+
+  cassandra:  # testing cassandra 
+    image: cassandra:3.11
+    hostname: cassandra
+    container_name: cassandra
+  
 
 networks:
   default:
