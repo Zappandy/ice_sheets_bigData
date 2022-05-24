@@ -16,6 +16,7 @@ services:
       STREAMS_SCHEMA_REGISTRY_PORT: ignored
       KAFKA_MUSIC_APP_REST_HOST: ignored
       KAFKA_MUSIC_APP_REST_PORT: ignored
+      APP_CLASS: "mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"
 
 networks:
   default:

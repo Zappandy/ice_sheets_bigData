@@ -16,11 +16,9 @@ ENV STREAMS_GROUP=$STREAMS_USER
 # This affects how strings in Java class files are interpreted.  We want UTF-8, and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
-
-ADD ./target/ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar ./
-
 ENV FATJAR="ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar"
-ENV KAFKA_EXT_DIFF_APP_CLASS="mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"
+
+ADD ./target/$FATJAR ./
 
 USER root
 
@@ -30,7 +28,6 @@ RUN mkdir /etc/$COMPONENT \
   && chown $STREAMS_USER:$STREAMS_GROUP /etc/$COMPONENT
 
 USER $STREAMS_USER
-#ENV ENV_VARIABLE_TEST="myvariable_dockerfile"
-# CMD ["sh", "-c", "echo ${ENV_VARIABLE_TEST}"]
-CMD ["java", "-cp", "ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar", "mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"]
-# CMD ["sh", "-c", "echo", "$STREAMS_EXAMPLES_FATJAR_DEPLOYED", "$KAFKA_EXT_DIFF_APP_CLASS"]
+
+# CMD ["java", "-cp", "ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar", "mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"]
+CMD ["sh", "-c", "java -cp ${FATJAR} ${APP_CLASS}"]
