@@ -5,7 +5,7 @@ import json
 KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
 LISTEN_TO_TOPICS = os.environ.get("LISTEN_TO_TOPICS")
 LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
-TOPIC_NAME = os.environ.get("ICE_SHEET_DIFF_TOPIC")
+TOPIC_NAME = os.environ.get("TOPIC_NAME")
 
 
 class IceSheetsDiffProcessor:
@@ -67,7 +67,8 @@ class IceSheetsDiffProcessor:
 
                 cur_elm["Difference"] = diff
                 print("sending...")
-                self.producer.send(topic="icesheetsdiff", value=cur_elm, key=cur_elm[self.key])
+                # TODO test with topic=self.topic
+                self.producer.send(topic=self.topic, value=cur_elm, key=cur_elm[self.key])
                 print(cur_elm)
 
 

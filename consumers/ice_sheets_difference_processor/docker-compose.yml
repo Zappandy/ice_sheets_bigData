@@ -5,10 +5,11 @@ services:
     container_name: difference_processor
     build: .
     environment:
-      KAFKA_BROKER_URL: broker:9092
+      KAFKA_BROKER_URL: broker:29092
       # how long to wait for messages in milliseconds
       LISTENER_TIMEOUT: 60000
       LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
+      TOPIC_NAME: ${ICE_SHEET_DIFF_TOPIC}
 
 networks:
   default:

@@ -25,7 +25,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Kafka Streams Quickstart :: Java</name>
+    <name>Ice Stream processors</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,26 +54,13 @@
 	-->
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-
         <pluginManagement>
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                        <compilerId>jdt</compilerId>
+                        <release>11</release>
                     </configuration>
                     <dependencies>
                         <dependency>

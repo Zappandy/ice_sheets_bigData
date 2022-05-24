@@ -5,7 +5,7 @@ services:
     container_name: ice_sheet_producer
     build: .
     environment:
-      KAFKA_BROKER_URL: broker:9092
+      KAFKA_BROKER_URL: broker:29092
       TOPIC_NAME: ${ICE_SHEET_TOPIC}
       CONTROL_TOPIC: ${CONTROL_TOPIC}
 

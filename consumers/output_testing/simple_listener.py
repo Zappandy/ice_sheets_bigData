@@ -9,7 +9,7 @@ LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
 if __name__ == "__main__":
     print("Trying to connect")
-    print(LISTEN_TO_TOPICS)
+    print("listening to topic:", LISTEN_TO_TOPICS)
     consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="debug",
                              bootstrap_servers=[KAFKA_BROKER_URL],
                              consumer_timeout_ms=LISTENER_TIMEOUT,
