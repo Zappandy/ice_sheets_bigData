@@ -3,7 +3,7 @@ version: "3"
 services:
 
   zookeeper:
-          image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:latest
     restart: always
     container_name: zookeeper
     hostname: zookeeper
@@ -77,8 +77,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-connect
-      hostname: datastax-connect
-      container_name: datastax-connect
     depends_on:
       - zookeeper
       - broker
@@ -106,11 +104,6 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
 
-  cassandra:  # testing cassandra 
-    image: cassandra:3.11
-    hostname: cassandra
-    container_name: cassandra
-  
 
 networks:
   default:
