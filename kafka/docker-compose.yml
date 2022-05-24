@@ -37,7 +37,8 @@ services:
       # ,${WEATHER_TOPIC}:1:1,${TWITTER_SINK_TOPIC}:1:1"
 
   init-kafka:
-      image: confluentinc/cp-kafka:6.1.1
+      image: confluentinc/cp-kafka:latest
+      #image: confluentinc/cp-kafka:6.1.1
       depends_on:
         - broker
       entrypoint: [ '/bin/sh', '-c' ]
