@@ -47,11 +47,11 @@ class IceSheetsDiffProcessor:
             # this is currently a non-distributable version of the code
             try:
                 records = self.consumer.poll(1000*5)
+                elms = list(records.values())[0]
             except Exception as e:
                 print("error polling records")
                 print(e)
                 continue
-            elms = list(records.values())[0]
             print(len(elms))
             for cur_rec in elms:
                 cur_elm = cur_rec.value

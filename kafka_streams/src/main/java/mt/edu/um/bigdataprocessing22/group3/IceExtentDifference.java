@@ -34,5 +34,4 @@ public class IceExtentDifference {
         // TopicLoader.runProducer();
         kafkaStreams.start();
     }
-
 }

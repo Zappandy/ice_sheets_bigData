@@ -4,19 +4,19 @@ version: '2'
 
 services:
   ice-diff-processor:
-    image: confluentinc/kafka-streams-examples:7.1.0
-    hostname: kafka-music-data-generator
+    build: .
     environment:
-      KAFKA_BROKER_URL: broker:9092
+      KAFKA_BROKER_URL: broker:29092
       # how long to wait for messages in milliseconds
       LISTENER_TIMEOUT: 60000
       LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
       TOPIC_NAME: ${ICE_SHEET_DIFF_TOPIC}    # Control startup order similarly to the "kafka-create-topics" container above.
+      STREAMS_BOOTSTRAP_SERVERS: ignored
+      STREAMS_SCHEMA_REGISTRY_HOST: ignored
+      STREAMS_SCHEMA_REGISTRY_PORT: ignored
+      KAFKA_MUSIC_APP_REST_HOST: ignored
+      KAFKA_MUSIC_APP_REST_PORT: ignored
 
-    # command: "bash -c 'echo Waiting for Kafka to be ready... && \
-    #                    cub kafka-ready -b broker:29092 1 20 && \
-    #                     java -cp /usr/share/java/ice_stream_processor/ice_stream_processors-1.0-SNAPSHOT.jar\
-    #                     mt.edu.um.bigdataprocessing22.group3.IceExtentDifference'"
 networks:
   default:
     external:

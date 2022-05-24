@@ -52,7 +52,9 @@
 		Execute "mvn clean package -Pbuild-jar"
 		to build a jar file out of this project!
 	-->
-
+    <!--
+        https://stackoverflow.com/questions/26482070/using-maven-assembly-plugin-with-local-dependencies
+    -->
     <build>
         <pluginManagement>
             <plugins>
@@ -77,17 +79,18 @@
                     <configuration>
                         <lifecycleMappingMetadata>
                             <pluginExecutions>
+                                <!-- copy-dependency plugin -->
                                 <pluginExecution>
                                     <pluginExecutionFilter>
                                         <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-assembly-plugin</artifactId>
-                                        <versionRange>[2.4,)</versionRange>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[1.0.0,)</versionRange>
                                         <goals>
-                                            <goal>single</goal>
+                                            <goal>copy-dependencies</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -110,6 +113,49 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <!-- creates one single JAR, run: mvn assembly:single | mvn install -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+
+        </plugins>
     </build>
 
     <dependencies>

@@ -1,13 +1,10 @@
 # Builds a docker image for Confluent's example applications for the Kafka Streams API
-ARG DOCKER_UPSTREAM_REGISTRY
 ARG DOCKER_UPSTREAM_TAG=latest
 
-FROM ${DOCKER_UPSTREAM_REGISTRY}confluentinc/cp-base-new:${DOCKER_UPSTREAM_TAG}
+FROM confluentinc/cp-base-new:${DOCKER_UPSTREAM_TAG}
 
-ARG STREAMS_VERSION
-ARG PROJECT_VERSION
-ARG ARTIFACT_ID
-ARG GIT_COMMIT
+ARG VERSION="1.0"
+ARG ARTIFACT_ID="IceExtentDifference"
 
 WORKDIR /build
 ENV COMPONENT="${ARTIFACT_ID}"
@@ -20,9 +17,9 @@ ENV STREAMS_GROUP=$STREAMS_USER
 # base image that supports it
 ENV LANG="C.UTF-8"
 
-ENV STREAMS_EXAMPLES_FATJAR="ice_stream_processor-${STREAMS_VERSION}-SNAPSHOT.jar"
-ENV STREAMS_APP_DIRECTORY="/usr/share/java/ice_stream_processor"
-ENV STREAMS_EXAMPLES_FATJAR_DEPLOYED="$STREAMS_APP_DIRECTORY/$STREAMS_EXAMPLES_FATJAR"
+ADD ./target/ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar ./
+
+ENV FATJAR="ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar"
 ENV KAFKA_EXT_DIFF_APP_CLASS="mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"
 
 USER root
@@ -33,5 +30,7 @@ RUN mkdir /etc/$COMPONENT \
   && chown $STREAMS_USER:$STREAMS_GROUP /etc/$COMPONENT
 
 USER $STREAMS_USER
-
-CMD ["java", "-cp", "${STREAMS_EXAMPLES_FATJAR_DEPLOYED}", "${KAFKA_EXT_DIFF_APP_CLASS}"]
+#ENV ENV_VARIABLE_TEST="myvariable_dockerfile"
+# CMD ["sh", "-c", "echo ${ENV_VARIABLE_TEST}"]
+CMD ["java", "-cp", "ice_stream_processors-1.0-SNAPSHOT-jar-with-dependencies.jar", "mt.edu.um.bigdataprocessing22.group3.IceExtentDifference"]
+# CMD ["sh", "-c", "echo", "$STREAMS_EXAMPLES_FATJAR_DEPLOYED", "$KAFKA_EXT_DIFF_APP_CLASS"]
