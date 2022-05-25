@@ -133,11 +133,22 @@ services:
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
 
+  cassandra_key_gen:
+    container_name: keyspace_generator
+    build:
+      context: .
+      dockerfile: Dockerfile_keyspace
+    networks:
+      - default
+
   cassandra-1:
     image: 'cassandra:latest'
-    mem_limit: 4g
+    #mem_limit: 4g
     container_name: 'cassandra-1'
     hostname: 'cassandra-1'
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile-cassandra
     healthcheck:
       test: ["CMD-SHELL", "cqlsh", "-e", "describe keyspaces" ]
       interval: 5s
@@ -145,20 +156,32 @@ services:
       retries: 60
     networks:
       - default
+        #pipelinenet:
+        #  ipv4_address: 172.24.2.5
+       
     ports:
       - "9042:9042"
-    environment:
-      - CASSANDRA_SEEDS=cassandra-1
-      - CASSANDRA_CLUSTER_NAME=Digitalis
-      - CASSANDRA_DC=DC1
-      - CASSANDRA_RACK=rack1
-      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
-      - CASSANDRA_NUM_TOKENS=128
+        #environment:
+            #- CASSANDRA_BROADCAST_ADDRESS=000.000.00.01  
+            #- CASSANDRA_LISTEN_ADDRESS=cassandra-1
+        #  - CASSANDRA_KEYSPACE=test_keypsace
+        #  - TABLE=test_table
+        #  - CASSANDRA_SEEDS=cassandra-1
+        #  - CASSANDRA_CLUSTER_NAME=test_cluster
+        #  - CASSANDRA_DC=DC1
+        #  - CASSANDRA_RACK=rack1
+        #  - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+        #  - CASSANDRA_NUM_TOKENS=128
 
 networks:
   default:
     external:
       name: kafka-network
-  secondary:  # not main network, it is kafka
-    external:
-      name: cassandra-network
+  #pipelinenet:
+  #  driver: bridge
+  #  ipam:
+  #    driver: default
+  #    config:
+  #            #- subnet: "172.21.0/16"
+  #      - subnet: "172.24.2.0/16"
+  #        gateway: "172.24.2.1"
