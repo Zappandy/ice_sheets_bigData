@@ -48,6 +48,7 @@ services:
         echo -e 'Creating kafka topics'
         kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $ICE_SHEET_TOPIC --replication-factor 1 --partitions 1
         kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $ICE_SHEET_DIFF_TOPIC --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $CONTROL_TOPIC --replication-factor 1 --partitions 1
   
         echo -e 'Successfully created the following topics:'
         kafka-topics --bootstrap-server broker:29092 --list
@@ -56,23 +57,51 @@ services:
         - default
 
 
-  kafka_manager:
-    image: hlebalbau/kafka-manager:stable
-    container_name: kakfa-manager
-    restart: always
-    ports:
-      - 9000:9000
+          #kafka_manager:
+          #  image: hlebalbau/kafka-manager:stable
+          #  container_name: kakfa-manager
+          #  restart: always
+          #  ports:
+          #    - 9000:9000
+          #  networks:
+          #    - default
+          #  environment:
+          #    ZK_HOSTS: "zookeeper:2181"
+          #    APPLICATION_SECRET: "random-secret"
+          #    KAFKA_MANAGER_AUTH_ENABLED: "true"
+          #    KAFKA_MANAGER_USERNAME: admin
+          #    KAFKA_MANAGER_PASSWORD: smellycat
+          #  command: -Dpidfile.path=/dev/null
+
+  kafka-schema-1:
+    image: 'confluentinc/cp-schema-registry:latest'
+    container_name: 'kafka-sr1'
+    hostname: 'kafka-sr1'
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z kafka-sr1 8081 || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
     networks:
       - default
+    ports:
+      - '8081:8081'
     environment:
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "random-secret"
-      KAFKA_MANAGER_AUTH_ENABLED: "true"
-      KAFKA_MANAGER_USERNAME: admin
-      KAFKA_MANAGER_PASSWORD: smellycat
-    command: -Dpidfile.path=/dev/null
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-1
+      SCHEMA_REGISTRY_LISTENERS: 'http://kafka-schema-1:8081'
+    depends_on:
+      - zookeeper
+
   connect:
-    image: datastax-connect:latest
+    image: cp-kafka-connect:latest
+    container_name: connect_1
+    #hostame: connect_1  not additional host names allowed
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8083 || exit1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
     build:
       context: .
       dockerfile: Dockerfile-connect
@@ -83,31 +112,53 @@ services:
       - "8083:8083"
     networks:
       - default
-      - secondary
+    volumes:
+      - ./vol-kafka-connect-jar:/etc/kafka-connect/jars
+      - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONNECT_REST_ADVERTISED_HOST_NAME: datastax-connect
       CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: datastax-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_GROUP_ID: cassandraConnect
+      CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
+      CONNECT_OFFSET_STORAGE_TOPIC: cassandraconnect-offset
+      CONNECT_STATUS_STORAGE_TOPIC: cassandraconnect-status
+      #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "test-kafka-network"
+      CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
+
+  cassandra-1:
+    image: 'cassandra:latest'
+    mem_limit: 4g
+    container_name: 'cassandra-1'
+    hostname: 'cassandra-1'
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh", "-e", "describe keyspaces" ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    networks:
+      - default
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_SEEDS=cassandra-1
+      - CASSANDRA_CLUSTER_NAME=Digitalis
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_NUM_TOKENS=128
 
 networks:
   default:
     external:
       name: kafka-network
-  secondary:
+  secondary:  # not main network, it is kafka
     external:
       name: cassandra-network
