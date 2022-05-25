@@ -1,0 +1,5 @@
+1. cd dash-deployment
+2. docker-compose build
+3. docker-compose up
+
+if built localy visit: 127.0.0.1:5000
