@@ -48,6 +48,7 @@ services:
         echo -e 'Creating kafka topics'
         kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $ICE_SHEET_TOPIC --replication-factor 1 --partitions 1
         kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $ICE_SHEET_DIFF_TOPIC --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic $CONTROL_TOPIC --replication-factor 1 --partitions 1
   
         echo -e 'Successfully created the following topics:'
         kafka-topics --bootstrap-server broker:29092 --list

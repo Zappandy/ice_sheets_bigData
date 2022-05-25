@@ -1,7 +1,10 @@
 import os
 import json
 import argparse
+import time
+
 import pandas as pd
+import multiprocessing
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 
@@ -17,7 +20,7 @@ class IceSheetsProducer:
         self.server = KAFKA_BROKER_URL
         self.topic = TOPIC_NAME
         self.kafka_producer = self.get_kafka_producer()
-        # self.kafka_control_listener = self.get_kafka_control_listener()
+        self.kafka_control_listener = self.get_kafka_control_listener()
 
         self.remaining_ind = len(self.data_df)
 
@@ -73,23 +76,48 @@ class IceSheetsProducer:
 
     def streaming_loop(self):
         go = True
-        pause = False
-        print("starting streaming messages...")
+        pause = True
+        speed = 0  # 0 is full speed, speed is determined by number of milliseconds of timeout per iteration
+
+        print("ice sheet processor ready on standby")
         i = 0
         while go and self.has_next():
-            elm = self.next()
-            # TODO: add control listener here. Listen to kafka control topic
-            control_vals = None
-            """
-            if self.kafka_control_listener.
-                control_vals =
-            
+            # control structure
+            # ideally this would set the speed and pause values asynchronously in another process for improved
+            # performance
+            control_record = self.kafka_control_listener.poll(1)
+            control = control_record.values()
+            if control:
+                for c in control:
+                    for c_vals in c:
+                        control_vals = c_vals.value
+                        if "topic" in control_vals and control_vals["topic"] == self.topic:
+                            try:
+                                pause = control_vals["pause"]
+                                if pause:
+                                    print("pausing...")
+                                else:
+                                    print("unpausing...")
+                            except KeyError:
+                                pass
+                            try:
+                                speed = control_vals["speed"]
+                                if speed > 0:
+                                    print(f"set speed to {speed}")
+                            except KeyError:
+                                pass
             if pause:
                 continue
-            """
+
+            if speed > 0:
+                time.sleep(speed/1000)
+
+            # data streaming
+            elm = self.next()
             self.kafka_producer.send(topic=self.topic, value=elm, key=elm[self.key])
             i += 1
-            if i % 10000 == 0:
+
+            if i % 1000 == 0:
                 print(f"sent messages: {i}")
 
 

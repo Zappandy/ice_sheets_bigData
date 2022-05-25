@@ -1,0 +1,8 @@
+{"topic":"icesheets","pause":true}
+
+{"topic":"icesheets","pause":false}
+
+{"topic":"icesheets","speed":100}
+
+{"topic":"icesheets","speed":100,"pause":false}
+{"topic":"icesheets","speed":1000,"pause":false}
