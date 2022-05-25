@@ -13,13 +13,7 @@ from cassandra.cluster import Cluster
 from cassandra.query import SimpleStatement
 
 KEYSPACE = "icesheet_keyspace"
-cmd = "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cassandra-1"
 
-find_ip = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
-res = find_ip.coommunicate()[0]
-res = res.decode("utf-8")
-print(res)
-raise SystemExit
 class cassandraKeyspace:
 
     def __init__(self):
@@ -27,8 +21,14 @@ class cassandraKeyspace:
 
 def createKeySpace():
     time.sleep(5)
-    cluster = Cluster(contact_points=['172.21.0.5'],port=9042)  # 172.21.0.6
+    contact_points= [f'172.21.0.{i}' for i in range(1, 10)]
+    cluster = Cluster(contact_points=contact_points,port=9042)  
+    #cluster = Cluster(contact_points=['172.21.0.5'],port=9042)  
+    #cluster = Cluster(contact_points=["localhost"],port=9042)  # 172.21.0.1, order of containers
     session = cluster.connect()
+
+    log.info("tito... help")
+    raise SystemExit
 
     log.info("Creating keyspace...")
 
@@ -62,4 +62,18 @@ def dropKeySpace():  # dropping key_space if needs to be deleted
     """
     pass
 
-#createKeySpace()
+createKeySpace()
+
+# https://docs.datastax.com/en/developer/python-driver/3.24/api/cassandra/cluster/
+# https://medium.com/nerd-for-tech/cassandra-multinode-setup-on-a-single-host-using-docker-fe3d8b844f52
+# https://medium.com/rahasak/end-to-end-streaming-from-kafka-to-cassandra-447d0e6ba25a
+# https://stackoverflow.com/questions/17157721/how-to-get-a-docker-containers-ip-address-from-the-host
+# https://devtonight.com/questions/how-to-assign-static-ip-addresses-to-docker-compose-containers
+# https://runnable.com/docker/basic-docker-networking
+# https://runnable.com/docker/docker-compose-networking
+# https://www.linkedin.com/pulse/creating-cassandra-keyspace-table-docker-start-up-amon-peter
+# https://digitalis.io/blog/apache-cassandra/getting-started-with-kafka-cassandra-connector/
+# https://github.com/digitalis-io/kafka-connect-cassandra-blog
+
+# https://blog.digitalis.io/containerized-cassandra-cluster-for-local-testing-60d24d70dcc4
+# https://github.com/OneCricketeer/apache-kafka-connect-docker
