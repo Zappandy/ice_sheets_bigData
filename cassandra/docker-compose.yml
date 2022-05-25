@@ -1,18 +1,50 @@
-version: '3'
+version: '3.9'
 
 services:
-  cassandradb:
-    container_name: cassandra
-    image: bootstrapcassandra
+  cassandra:
+    container_name: cassandradb
+    image: cassandra:latest
+    #image: docker.io/bitnami/cassandra:latest
     build:
         context: .
         dockerfile: Dockerfile
+
+    #build: .
     ports:
       - 7000:7000
       - 9042:9042
     volumes:
-      - $PWD/cassandra/data:/var/lib/cassandra
-networks:
-  default:
-    external:
-      name: cassandra-network
+            #- $PWD/cassandra/data:/var/lib/cassandra
+            #- .:/docker-entrypoint-initdb.d  # unhealthy
+            #- 'cassandra_data:/bitnami'
+            - ~/apps/cassandra:/var/lib/cassandra
+        #- './cassandra-init.sh:/cassandra-init.sh'
+        #healthcheck:
+        #  test: ["CMD", "/opt/bitnami/cassandra/bin/cqlsh", "-u cassandra", "-p cassandra", "-e \"describe keyspaces\""]
+        #  interval: 15s
+        #  timeout: 10s
+        #  retries: 10
+    environment:
+            #- CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_CLUSTER_NAME=testing
+        #- CASSANDRA_PASSWORD_SEEDER=yes
+        #- CASSANDRA_PASSWORD=cassandra
+    #  "
+
+        #cassandra-load-keyspace:
+        #  container_name: cassandra-load-keyspace
+        #  image: docker.io/bitnami/cassandra:latest
+        #  depends_on:
+        #    cassandra:
+        #       condition: service_healthy
+        #  volumes:
+        #    - 'cassandra_data:./schema.cql'
+        #  command: /bin/bash -c "sleep 60 && echo loading cassandra keyspace && cqlsh cassandra -f ./schema.cql"
+
+        #volumes:
+        #  cassandra_data:
+        #    driver: local
+            
+    #networks:
+    #  default:
+    #    name: cassandra-network

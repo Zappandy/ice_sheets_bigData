@@ -14,6 +14,7 @@ if [ "$1" = 'dse' -a "$2" = 'cassandra' ]; then
 
     # Invoke the entrypoint script to start Cassandra as a background job and get the pid
     # starting Cassandra in the background the first time allows us to monitor progress and register schema
+
     echo '=> Starting Cassandra'
     /docker-entrypoint.sh &
     dse_pid="$!"
