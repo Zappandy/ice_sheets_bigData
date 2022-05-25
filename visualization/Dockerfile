@@ -4,9 +4,9 @@ RUN apt-get install nano
  
 RUN mkdir wd
 WORKDIR wd
-COPY visualization/requirements.txt .
+COPY app/requirements.txt .
 RUN pip3 install -r requirements.txt
   
-COPY visualization/ ./
+COPY app/ ./
   
 CMD [ "gunicorn", "--workers=5", "--threads=1", "-b 0.0.0.0:80", "app:server"]
