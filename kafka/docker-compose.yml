@@ -143,7 +143,7 @@ services:
 
   cassandra-1:
     image: 'cassandra:latest'
-    #mem_limit: 4g
+    # mem_limit: 4g
     container_name: 'cassandra-1'
     hostname: 'cassandra-1'
     build:
