@@ -2,14 +2,16 @@ FROM python:3.8
 
 WORKDIR /usr/app
 
-ADD ./requirements.txt ./
+COPY ./caribou_producer/requirements.txt ./
+COPY ./caribou_producer/CaribouProducer.py ./
+COPY ./__init__.py ./producers/
+COPY ./BaseProducer.py ./producers/
+
 RUN pip install -r requirements.txt
 RUN mkdir ./data
 # downloading data when building the container is janky. We should probably download it when starting the producer
 # having the data ready is faster for debugging than downloading everytime
-RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/south/daily/data/ -P ./data
-RUN wget --ftp-user=anonymous -r -nd ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/north/daily/data/ -P ./data
-ADD ./ ./
+RUN wget http://geo.abds.is/geonetwork/srv/api/records/ffe3b83c-e9f5-48e4-882d-08324a813cee/attachments/03_Tab01_CaribouFInal.xlsx -P ./data
 
 # CMD ["python3", "-u", "send_data.py", "--dataset_name", "SeaIceExtent", "--input_dir", "./data"]
-CMD ["python3", "-u", "IceSheetsProducer.py", "--input_dir", "./data"]
+CMD ["python3", "-u", "CaribouProducer.py", "--input_dir", "./data"]

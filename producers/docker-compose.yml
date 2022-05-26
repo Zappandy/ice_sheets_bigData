@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  icesheets:
+    container_name: ice_sheet_producer
+    build:
+      context: .
+      dockerfile: ice_sheets_producer/Dockerfile-icesheets
+    environment:
+      KAFKA_BROKER_URL: broker:29092
+      TOPIC_NAME: ${ICE_SHEET_TOPIC}
+      CONTROL_TOPIC: ${CONTROL_TOPIC}
+
+  caribou:
+    container_name: caribou_producer
+    build:
+      context: .
+      dockerfile: caribou_producer/Dockerfile-caribou
+    environment:
+      KAFKA_BROKER_URL: broker:29092
+      TOPIC_NAME: ${CARIBOU_TOPIC}
+      CONTROL_TOPIC: ${CONTROL_TOPIC}
+
+networks:
+  default:
+    external:
+      name: kafka-network
