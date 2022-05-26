@@ -56,42 +56,23 @@ services:
       networks:
         - default
 
-
-          #kafka_manager:
-          #  image: hlebalbau/kafka-manager:stable
-          #  container_name: kakfa-manager
-          #  restart: always
-          #  ports:
-          #    - 9000:9000
-          #  networks:
-          #    - default
-          #  environment:
-          #    ZK_HOSTS: "zookeeper:2181"
-          #    APPLICATION_SECRET: "random-secret"
-          #    KAFKA_MANAGER_AUTH_ENABLED: "true"
-          #    KAFKA_MANAGER_USERNAME: admin
-          #    KAFKA_MANAGER_PASSWORD: smellycat
-          #  command: -Dpidfile.path=/dev/null
-
-  kafka-schema-1:
-    image: 'confluentinc/cp-schema-registry:latest'
-    container_name: 'kafka-sr1'
-    hostname: 'kafka-sr1'
+  cassandra-1:
+    image: 'cassandra:latest'
+    # mem_limit: 4g
+    container_name: 'cassandra-1'
+    hostname: 'cassandra-1'
+    build:
+      context: .
+      dockerfile: Dockerfile-cassandra
     healthcheck:
-      test: ["CMD-SHELL", "nc -z kafka-sr1 8081 || exit 1" ]
+      test: ["CMD-SHELL", "cqlsh", "-e", "describe keyspaces" ]
       interval: 5s
       timeout: 5s
       retries: 60
     networks:
       - default
     ports:
-      - '8081:8081'
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
-      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-1
-      SCHEMA_REGISTRY_LISTENERS: 'http://kafka-schema-1:8081'
-    depends_on:
-      - zookeeper
+      - "9042:9042"
 
   connect:
     image: cp-kafka-connect:latest
@@ -132,23 +113,42 @@ services:
       CONNECT_REST_ADVERTISED_HOST_NAME: "test-kafka-network"
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
-  cassandra-1:
-    image: 'cassandra:latest'
-    # mem_limit: 4g
-    container_name: 'cassandra-1'
-    hostname: 'cassandra-1'
-    build:
-      context: .
-      dockerfile: Dockerfile-cassandra
-    healthcheck:
-      test: ["CMD-SHELL", "cqlsh", "-e", "describe keyspaces" ]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-    networks:
-      - default
-    ports:
-      - "9042:9042"
+
+          #kafka_manager:
+          #  image: hlebalbau/kafka-manager:stable
+          #  container_name: kakfa-manager
+          #  restart: always
+          #  ports:
+          #    - 9000:9000
+          #  networks:
+          #    - default
+          #  environment:
+          #    ZK_HOSTS: "zookeeper:2181"
+          #    APPLICATION_SECRET: "random-secret"
+          #    KAFKA_MANAGER_AUTH_ENABLED: "true"
+          #    KAFKA_MANAGER_USERNAME: admin
+          #    KAFKA_MANAGER_PASSWORD: smellycat
+          #  command: -Dpidfile.path=/dev/null
+
+          #kafka-schema-1:
+          #  image: 'confluentinc/cp-schema-registry:latest'
+          #  container_name: 'kafka-sr1'
+          #  hostname: 'kafka-sr1'
+          #  healthcheck:
+          #    test: ["CMD-SHELL", "nc -z kafka-sr1 8081 || exit 1" ]
+          #    interval: 5s
+          #    timeout: 5s
+          #    retries: 60
+          #  networks:
+          #    - default
+          #  ports:
+          #    - '8081:8081'
+          #  environment:
+          #    SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+          #    SCHEMA_REGISTRY_HOST_NAME: kafka-schema-1
+          #    SCHEMA_REGISTRY_LISTENERS: 'http://kafka-schema-1:8081'
+          #  depends_on:
+          #    - zookeeper
 
 networks:
   default:
