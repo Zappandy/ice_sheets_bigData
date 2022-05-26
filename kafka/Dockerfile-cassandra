@@ -1,0 +1,11 @@
+FROM cassandra:latest
+ENV LANG C.UTF-8
+
+#COPY *.cql /docker-entrypoint-initdb.d/
+COPY keyspace.cql /
+COPY cassandra_init.sh /
+RUN chmod +x keyspace.cql
+RUN chmod +x cassandra_init.sh
+ENTRYPOINT ["/cassandra_init.sh"]
+CMD ["cassandra", "-f"]
+#CMD ["cqlsh", "cassandra", "-f", "keyspace.cql"]

@@ -133,22 +133,22 @@ services:
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
 
-  cassandra_key_gen:
-    container_name: keyspace_generator
-    build:
-      context: .
-      dockerfile: Dockerfile_keyspace
-    networks:
-      - default
+      #cassandra_key_gen:
+      #  container_name: keyspace_generator
+      #  build:
+      #    context: .
+      #    dockerfile: Dockerfile_keyspace
+      #  networks:
+      #    - default
 
   cassandra-1:
     image: 'cassandra:latest'
     #mem_limit: 4g
     container_name: 'cassandra-1'
     hostname: 'cassandra-1'
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile-cassandra
+    build:
+      context: .
+      dockerfile: Dockerfile-cassandra
     healthcheck:
       test: ["CMD-SHELL", "cqlsh", "-e", "describe keyspaces" ]
       interval: 5s
