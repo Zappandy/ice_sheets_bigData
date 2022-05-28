@@ -57,7 +57,7 @@ services:
       networks:
         - default
 
-          #kafka-schema-1:  # for avro schemata
+          #kafka-schema-1:  # for avro and json schemata
           #  image: 'confluentinc/cp-schema-registry:latest'
           #  container_name: 'kafka-schema-1'
           #  hostname: 'kafka-schema-1'
@@ -115,11 +115,13 @@ services:
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
 
-      #CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      #CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      #CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
-      #CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-
+      # trigger warnings 
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      # end of warnings 
+      
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect-hostname"
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
