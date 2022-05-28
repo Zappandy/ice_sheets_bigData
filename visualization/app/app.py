@@ -5,13 +5,21 @@ import dash_html_components as html
 import plotly.express as px
 from flask import Flask
 import pandas as pd
+from cassandra.cluster import Cluster
 import dash
-  
+
+#getting conection with cassandra
+cluster = Cluster(['127.0.0.1'])
+session = cluster.connect('icesheets_cluster')
+
+
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Dashboard'
   
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+session.execute('icesheet_keyspace')
+session.execute('icesheetreport')
+
   
 app.layout = dbc.Container([ 
   
