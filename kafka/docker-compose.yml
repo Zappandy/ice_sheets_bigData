@@ -153,9 +153,13 @@ services:
       - default
     ports:
       - "9042:9042"
-    environment:
+    environment:  # should other containers be dependent on cassandra to wait until everything is running? possibly less efficient...
       - CASSANDRA_CLUSTER_NAME=icesheets_cluster
       - CASSANDRA_SEEDS=cassandra-1
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_NUM_TOKENS=128
 
           #kafka_manager:  # as num of clusters increase, it may be needed
           #  image: hlebalbau/kafka-manager:stable
