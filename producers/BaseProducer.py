@@ -92,9 +92,7 @@ class BaseProducer:
 
             # data streaming
             elm = self.next()
-            print(self.key)
-            print(elm)
-            self.kafka_producer.send(topic=self.topic, value=elm, key=elm[self.key])
+            self.kafka_producer.send(topic=self.topic, value=elm, key=str(elm[self.key]))
             i += 1
 
             if i % 1000 == 0:
