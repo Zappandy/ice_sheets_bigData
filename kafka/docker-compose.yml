@@ -57,25 +57,26 @@ services:
       networks:
         - default
 
-  kafka-schema-1:
-    image: 'confluentinc/cp-schema-registry:latest'
-    container_name: 'kafka-schema-1'
-    hostname: 'kafka-schema-1'
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z kafka-sr1 8081 || exit 1" ]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-    networks:
-      - default
-    ports:
-      - '8081:8081'
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:9092'
-      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-1
-      SCHEMA_REGISTRY_LISTENERS: 'http://kafka-schema-1:8081'
-    depends_on:
-      - zookeeper
+          #kafka-schema-1:  # for avro schemata
+          #  image: 'confluentinc/cp-schema-registry:latest'
+          #  container_name: 'kafka-schema-1'
+          #  hostname: 'kafka-schema-1'
+          #  healthcheck:
+          #    test: ["CMD-SHELL", "nc -z kafka-sr1 8081 || exit 1" ]
+          #    interval: 5s
+          #    timeout: 5s
+          #    retries: 60
+          #  networks:
+          #    - default
+          #  ports:
+          #    - '8081:8081'
+          #  environment:
+          #    SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:9092'
+          #          #SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'localhost:9092'
+          #    SCHEMA_REGISTRY_HOST_NAME: kafka-schema-1
+          #    SCHEMA_REGISTRY_LISTENERS: 'http://kafka-schema-1:8081'
+          #  depends_on:
+          #    - zookeeper
    
   connect_1:
     #image: cp-kafka-connect:latest  
@@ -105,15 +106,20 @@ services:
       CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: cassandraConnect
       CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
       CONNECT_OFFSET_STORAGE_TOPIC: cassandraconnect-offset
       CONNECT_STATUS_STORAGE_TOPIC: cassandraconnect-status
       #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
-      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+
+      #CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      #CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      #CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
+      #CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect-hostname"
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
