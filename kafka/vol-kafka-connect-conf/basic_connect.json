@@ -3,12 +3,11 @@
 	"config": {
 		"connector.class": "com.datastax.oss.kafka.sink.CassandraSinkConnector",
 		"tasks.max": "1",
-		"topics": "basic_topic",
+		"topics": "icesheets",
 		"contactPoints": "cassandra-1",
 		"loadBalancing.localDc": "DC1",
-		"topic.basic_topic.connect.basic_table.mapping": "userid=key, username=value",
+		"topic.icesheets.icesheet_keyspace.icesheetreport.mapping": "hemisphere=key, extend=value",
 		"key.converter": "org.apache.kafka.connect.storage.StringConverter",
-		"value.converter": "org.apache.kafka.connect.storage.StringConverter",
         "key.converter.schemas.enable": false,
         "value.converter.schemas.enable": false
 	}

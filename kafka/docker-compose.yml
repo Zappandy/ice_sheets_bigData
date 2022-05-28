@@ -99,9 +99,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 60
-      #build:
-      #  context: .
-      #  dockerfile: Dockerfile-connect
+    build:
+      context: .
+      dockerfile: connectDockerfile
     depends_on:
       - zookeeper
       - broker
