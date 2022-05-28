@@ -27,7 +27,7 @@ public class CaribouSplit {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        KStream<String, String> firstStream = builder.stream(inputTopic, Consumed.with(JsonSerde(), JsonSerde()));
+        KStream<String, String> firstStream = builder.stream(inputTopic, Consumed.with(new JsonSerde<>(), new JsonSerde<>()));
 
         firstStream.peek((key, value) -> System.out.println("Incoming record - key " + key +" value " + value))
                 .to(outputTopic, Produced.with(Serdes.String(), Serdes.String()));

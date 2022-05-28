@@ -7,6 +7,8 @@ from kafka import KafkaProducer, KafkaConsumer
 
 class BaseProducer:
     def __init__(self, data_source):
+        # column name for which column in DF to use as partition key
+        self.key = None
         self.data_source = data_source
         self.data_df = self.load_dataset()
         self.server = os.environ.get("KAFKA_BROKER_URL")
@@ -17,8 +19,7 @@ class BaseProducer:
 
         self.remaining_ind = len(self.data_df)
 
-        # column name for which column in DF to use as partition key
-        self.key = None
+        print(self.data_df.columns)
 
     def load_dataset(self):
         pass
@@ -35,7 +36,7 @@ class BaseProducer:
         return self.remaining_ind > 0
 
     def get_kafka_producer(self):
-        print("connecting to kafka broker")
+        print("connecting to kafka broker for producing")
         prod = KafkaProducer(bootstrap_servers=self.server,
                              value_serializer=lambda x: json.dumps(x).encode('utf-8'),
                              key_serializer=lambda s: s.encode('utf-8'))
@@ -43,10 +44,12 @@ class BaseProducer:
         return prod
 
     def get_kafka_control_listener(self):
-        consumer = KafkaConsumer(self.control_topic, group_id="control",
+        print(f"connecting on topic {self.control_topic} for consuming")
+        consumer = KafkaConsumer(self.control_topic,
                                  bootstrap_servers=[self.server],
                                  # consumer_timeout_ms=LISTENER_TIMEOUT,
                                  value_deserializer=lambda m: json.loads(m.decode('utf-8')))
+        print("connected")
         return consumer
 
     def streaming_loop(self):
@@ -89,6 +92,8 @@ class BaseProducer:
 
             # data streaming
             elm = self.next()
+            print(self.key)
+            print(elm)
             self.kafka_producer.send(topic=self.topic, value=elm, key=elm[self.key])
             i += 1
 
