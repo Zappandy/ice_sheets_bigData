@@ -4,8 +4,8 @@ services:
   dashboard:
     build: 
       context: ./
-    container_name: ice_sheet_viz dashboard
-    hostname: ice_sheet_viz dashboord
+    container_name: icesheetviz
+    hostname: icesheetviz
     restart: always
     ports:
       - 5000:80
