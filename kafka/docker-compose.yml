@@ -153,8 +153,11 @@ services:
       - default
     ports:
       - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=icesheets_cluster
+      - CASSANDRA_SEEDS=cassandra-1
 
-          #kafka_manager:
+          #kafka_manager:  # as num of clusters increase, it may be needed
           #  image: hlebalbau/kafka-manager:stable
           #  container_name: kakfa-manager
           #  restart: always
