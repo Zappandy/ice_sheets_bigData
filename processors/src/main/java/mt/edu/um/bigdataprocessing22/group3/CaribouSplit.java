@@ -1,7 +1,5 @@
 package mt.edu.um.bigdataprocessing22.group3;
 
-import org.springframework.kafka.support.serializer.JsonSerde;
-
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -9,6 +7,7 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -27,13 +26,23 @@ public class CaribouSplit {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        KStream<String, String> firstStream = builder.stream(inputTopic, Consumed.with(JsonSerde(), JsonSerde()));
+        KStream<String, String> firstStream = builder.stream(inputTopic, Consumed.with(Serdes.String(), Serdes.String()));
 
         firstStream.peek((key, value) -> System.out.println("Incoming record - key " + key +" value " + value))
+                .mapValues(CaribouSplit::stringToJsonObject)
+                .mapValues(CaribouSplit::jsonObjectToString)
                 .to(outputTopic, Produced.with(Serdes.String(), Serdes.String()));
 
         KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), streamsProps);
         // TopicLoader.runProducer();
         kafkaStreams.start();
+        kafkaStreams.close();
+    }
+
+    public static JSONObject stringToJsonObject(String input){
+        return new JSONObject(input);
+    }
+    public static String jsonObjectToString(JSONObject input){
+        return input.toString();
     }
 }

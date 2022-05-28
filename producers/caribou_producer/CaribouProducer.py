@@ -23,7 +23,9 @@ class CaribouProducer(BaseProducer):
         print("loading data...")
         # could be swapped to streaming from disk. Then, without using pandas
         df = pd.read_excel(f"{self.data_source.rstrip('/')}/03_Tab01_CaribouFInal.xlsx")
+        self.key = "Year"
         return df
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Data streaming utility for sending climate datasets to kafka")

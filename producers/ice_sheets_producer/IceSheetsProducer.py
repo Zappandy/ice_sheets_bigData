@@ -31,6 +31,7 @@ class IceSheetsProducer(BaseProducer):
         print("data loading complete")
 
         self.key = "Hemisphere"
+
         return df_combined
 
 
