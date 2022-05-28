@@ -16,7 +16,7 @@ The control message specifies which topic and which parameter to control
 ```
 faster
 ```
-{"topic":"icesheegtts","speed":100,"pause":false}
+{"topic":"icesheets","speed":100,"pause":false}
 ```
 slower
 ```
