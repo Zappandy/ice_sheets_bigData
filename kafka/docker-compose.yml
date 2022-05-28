@@ -112,14 +112,16 @@ services:
     volumes:
       - ./vol-kafka-connect-jar:/etc/kafka-connect/jars
       - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
+        #- ./vol-kafka-connect-jar/kafka-connect-cassandra-sink-*.jar:/usr/local/share/kafka/plugins
+      - ./vol-kafka-connect-jar/:/usr/local/share/kafka/plugins
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: cassandraConnect
-      CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+      CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
       CONNECT_OFFSET_STORAGE_TOPIC: cassandraconnect-offset
       CONNECT_STATUS_STORAGE_TOPIC: cassandraconnect-status
       #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
@@ -134,6 +136,7 @@ services:
       # end of warnings 
       
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect-hostname"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "connect_1"
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
 
