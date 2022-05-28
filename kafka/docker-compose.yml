@@ -110,10 +110,10 @@ services:
     networks:
       - default
     volumes:
-      - ./vol-kafka-connect-jar:/etc/kafka-connect/jars
+            #- ./vol-kafka-connect-jar:/etc/kafka-connect/jars
       - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
         #- ./vol-kafka-connect-jar/kafka-connect-cassandra-sink-*.jar:/usr/local/share/kafka/plugins
-      - ./vol-kafka-connect-jar/:/usr/local/share/kafka/plugins
+        #- ./vol-kafka-connect-jar/:/usr/local/share/kafka/plugins
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_PORT: 8083
