@@ -1,6 +1,5 @@
 FROM cassandra:latest
 ENV LANG C.UTF-8
-
 COPY custom_entrypoint.sh /
 COPY cassandra_init.sh /
 RUN chmod +x custom_entrypoint.sh
