@@ -157,7 +157,7 @@ services:
       retries: 60
     build:
       context: .
-      dockerfile: connectDockerfile
+      dockerfile: connectDockerfile  # new_connectDockerfile to try to run the curl from shell
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_ADVERTISED_HOST_NAME: datastax-connect
