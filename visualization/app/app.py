@@ -9,17 +9,19 @@ from cassandra.cluster import Cluster
 import dash
 
 # getting conection with cassandra
-cluster = Cluster()
-session = cluster.connect('cassandra-1')
+# cluster = Cluster()
+# session = cluster.connect('cassandra-1')
 keyspace = "icesheet_keyspace"
+cluster = Cluster(['cassandra-1'])
+session =  cluster.connect()
 
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Dashboard'
   
 session.set_keyspace(keyspace)
-# session.execute('SELECT * FROM icesheetreport')
 session.execute('SELECT * FROM icesheetreport')
+# print(session.execute('SELECT * FROM icesheetreport'))
 # df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
   
 app.layout = dbc.Container([ 
