@@ -15,5 +15,6 @@ services:
 
       
 networks:
-  network:
-    driver: bridge
+  default:
+    external:
+      name: kafka-network
