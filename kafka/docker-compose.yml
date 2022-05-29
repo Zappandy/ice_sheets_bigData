@@ -89,18 +89,58 @@ services:
           #  depends_on:
           #    - zookeeper
    
-  connect_1:
-    #image: cp-kafka-connect:latest  
-    image: 'confluentinc/cp-kafka-connect:latest'
-    container_name: 'connect_1'
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 8083 || exit1"]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-    build:
-      context: .
-      dockerfile: connectDockerfile
+  #connect_1:
+  #  image: 'confluentinc/cp-kafka-connect:latest'
+  #  container_name: 'connect_1'
+  #  healthcheck:
+  #    test: ["CMD-SHELL", "nc -z localhost 8083 || exit1"]
+  #    interval: 5s
+  #    timeout: 5s
+  #    retries: 60
+  #  build:
+  #    context: .
+  #    dockerfile: connectDockerfile
+  #  depends_on:
+  #    - zookeeper
+  #    - broker
+  #  ports:
+  #    - "8083:8083"
+  #  networks:
+  #    - default
+  #  volumes:
+  #          #- ./vol-kafka-connect-jar:/etc/kafka-connect/jars
+  #    - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
+  #  environment:
+  #    CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+  #    CONNECT_REST_PORT: 8083
+  #    CONNECT_GROUP_ID: cassandraConnect
+  #    CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+  #    CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+  #    CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
+  #    CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
+  #    CONNECT_OFFSET_STORAGE_TOPIC: cassandraconnect-offset
+  #    CONNECT_STATUS_STORAGE_TOPIC: cassandraconnect-status
+  #    #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+  #    CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #    CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+  #    # trigger warnings 
+  #    CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #    CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #    CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
+  #    CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+  #    # end of warnings 
+  #    
+  #    CONNECT_REST_ADVERTISED_HOST_NAME: "connect-hostname"
+  #    CONNECT_REST_ADVERTISED_HOST_NAME: "connect_1"
+  #    CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
+
+  #    CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+
+  connect:
+    image: datastax-connect:latest
+    hostname: datastax-connect
+    container_name: datastax-connect
     depends_on:
       - zookeeper
       - broker
@@ -109,34 +149,34 @@ services:
     networks:
       - default
     volumes:
-            #- ./vol-kafka-connect-jar:/etc/kafka-connect/jars
       - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8083 || exit1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    build:
+      context: .
+      dockerfile: test_connectDockerfile
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONNECT_REST_ADVERTISED_HOST_NAME: datastax-connect
       CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: cassandraConnect
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1  # changing default from 3 because we only have one broker
-      CONNECT_CONFIG_STORAGE_TOPIC: cassandraconnect-config
-      CONNECT_OFFSET_STORAGE_TOPIC: cassandraconnect-offset
-      CONNECT_STATUS_STORAGE_TOPIC: cassandraconnect-status
-      #CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_GROUP_ID: datastax-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
-      # trigger warnings 
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_KEY_CONVERTER_SCHHEMAS_ENABLE: "false"
-      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-      # end of warnings 
-      
-      CONNECT_REST_ADVERTISED_HOST_NAME: "connect-hostname"
-      CONNECT_REST_ADVERTISED_HOST_NAME: "connect_1"
-      CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
-
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+
 
   cassandra-1:
     image: 'cassandra:latest'
@@ -158,7 +198,7 @@ services:
     environment:  # should other containers be dependent on cassandra to wait until everything is running? possibly less efficient...
       - CASSANDRA_CLUSTER_NAME=icesheets_cluster
       - CASSANDRA_SEEDS=cassandra-1
-      - CASSANDRA_DC=DC1
+      - CASSANDRA_DC=datacenter1
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_NUM_TOKENS=128

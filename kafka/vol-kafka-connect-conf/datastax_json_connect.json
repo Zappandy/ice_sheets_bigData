@@ -1,0 +1,12 @@
+{
+  "name": "cass_json_sink",
+  "config": {
+    "connector.class": "com.datastax.oss.kafka.sink.CassandraSinkConnector",
+    "tasks.max": "10",
+    "topics": "icesheets",
+    "contactPoints": "cassandra-1",
+    "loadBalancing.localDc": "datacenter1",
+    "topic.icesheets.icesheet_keyspace.icesheetreport.mapping": "Year=value.Year, Month=value.Month, Day=value.Day, Hemisphere=key.Hemisphere, Extent=value.Extent, Missing=value.Missing",
+    "topic.icesheets.icesheet_keyspace.icesheetreport.consistencyLevel": "LOCAL_QUORUM"
+  }
+}
