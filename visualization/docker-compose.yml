@@ -16,4 +16,4 @@ services:
       
 networks:
   network:
-    driver: kafka-network
+    driver: bridge
