@@ -26,4 +26,5 @@ six==1.15.0
 Werkzeug==1.0.1
 gunicorn==20.0.4
 cassandra-driver
-socket
+contextlib==3.10.4
+socket==4.5.1
