@@ -6,7 +6,7 @@
 		"topics": "icesheets",
 		"contactPoints": "cassandra-1",
 		"loadBalancing.localDc": "DC1",
-		"topic.icesheets.icesheet_keyspace.icesheetreport.mapping": "year=value.year, month=value.month, day=value.day, hemisphere=key.hemisphere, extend=value.extend, missing=value.missing",
+		"topic.icesheets.icesheet_keyspace.icesheetreport.mapping": "Year=value.Year, Month=value.Month, Day=value.Day, Hemisphere=key.Hemisphere, Extent=value.Extent, Missing=value.Missing",
 		"key.converter": "org.apache.kafka.connect.storage.StringConverter",
         "key.converter.schemas.enable": false,
         "value.converter.schemas.enable": false
