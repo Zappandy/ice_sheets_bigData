@@ -157,7 +157,7 @@ services:
       retries: 60
     build:
       context: .
-      dockerfile: test_connectDockerfile
+      dockerfile: connectDockerfile
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_ADVERTISED_HOST_NAME: datastax-connect

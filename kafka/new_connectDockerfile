@@ -1,0 +1,17 @@
+FROM confluentinc/cp-kafka-connect-base:5.3.0
+# latest or 7.1.1
+WORKDIR /etc/kafka-connect/jars
+RUN curl -O -L "https://downloads.datastax.com/kafka/kafka-connect-cassandra-sink.tar.gz" \
+&& tar -zxf kafka-connect-cassandra-sink.tar.gz \
+&& rm kafka-connect-cassandra-sink.tar.gz 
+
+ENV CONNECT_PLUGIN_PATH="/usr/share/java,/datastax-connector/kafka-connect-cassandra.jar"
+
+WORKDIR /usr/app
+
+COPY connect/ .
+RUN chmod +x *.sh
+CMD [ "/bin/bash", "-c", "echo \"Launching Kafka Connect\" & \
+       /etc/confluent/docker/run & /usr/app/start-and-wait.sh"]
+#&& cp kafka-connect-cassandra-sink-* /usr/local/share/kafka/plugins \
+#RUN cp -r kafka-connect-cassandra-sink-* /etc/kafka-connect/jars
