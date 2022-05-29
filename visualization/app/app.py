@@ -7,19 +7,19 @@ from flask import Flask
 import pandas as pd
 from cassandra.cluster import Cluster
 import dash
-from contextlib import closing
-import socket
+# from contextlib import closing
+# import socket
 
 
-def find_open_ports():
-    for port in range(1, 8081):
-        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            res = sock.connect_ex(('localhost', port))
-            if res == 0:
-                yield port
+# def find_open_ports():
+#     for port in range(1, 8081):
+#         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+#             res = sock.connect_ex(('localhost', port))
+#             if res == 0:
+#                 yield port
 
-available_ports = list(find_open_ports())
-print(available_ports)
+# available_ports = list(find_open_ports())
+# print(available_ports)
 
 # getting conection with cassandra
 cluster = Cluster(['127.0.0.1'],port=9042)
