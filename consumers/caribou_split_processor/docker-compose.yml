@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  difference_processor:
+    container_name: split_processor
+    build: .
+    environment:
+      KAFKA_BROKER_URL: broker:29092
+      # how long to wait for messages in milliseconds
+      LISTENER_TIMEOUT: 60000
+      LISTEN_TO_TOPICS: ${CARIBOU_TOPIC}
+      TOPIC_NAME: ${CARIBOU_SPLIT_TOPIC}
+
+networks:
+  default:
+    external:
+      name: kafka-network
