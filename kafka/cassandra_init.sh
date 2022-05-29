@@ -3,11 +3,13 @@ set -e
 
 #TBT="CREATE TABLE icesheetreport(_year INT, _month INT, _day INT, extend FLOAT, missing FLOAT, hemisphere TEXT) PRIMARY KEY (hemisphere, extend);"
 # primary key is to identify a row
-#CQL="CREATE KEYSPACE IF NOT EXISTS icesheet_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};"
-CQL="CREATE KEYSPACE IF NOT EXISTS icesheet_keyspace
+#the drop statement is here to store data for every stream, improve CQL command via python to simply add data per every new run
+# although unneeded for this problem
+CQL="DROP KEYSPACE IF EXISTS icesheet_keyspace
+     CREATE KEYSPACE icesheet_keyspace
      WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
      USE icesheet_keyspace;
-     CREATE TABLE IF NOT EXISTS icesheetreport(year INT, month INT, day INT,
+     CREATE TABLE icesheetreport(year INT, month INT, day INT,
      extend FLOAT, missing FLOAT, hemisphere TEXT, PRIMARY KEY (hemisphere));
      "
 until echo $CQL | cqlsh; do
