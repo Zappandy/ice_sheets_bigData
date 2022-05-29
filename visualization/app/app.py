@@ -22,7 +22,7 @@ available_ports = list(find_open_ports())
 print(available_ports)
 
 # getting conection with cassandra
-cluster = Cluster(['0.0.0.0'],port=9042)
+cluster = Cluster(['127.0.0.1'],port=9042)
 session = cluster.connect()
 keyspace = "icesheet_keyspace"
 
