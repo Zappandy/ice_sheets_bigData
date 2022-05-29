@@ -2,7 +2,7 @@
 
 run 
 ```sh
-docker exec -it connect_1
+docker exec -it connect_1 bash
 ```
 
 see if connection is okay by running
