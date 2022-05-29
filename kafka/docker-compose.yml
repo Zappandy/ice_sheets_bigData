@@ -92,7 +92,6 @@ services:
   connect_1:
     #image: cp-kafka-connect:latest  
     image: 'confluentinc/cp-kafka-connect:latest'
-     # https://hub.docker.com/r/confluentinc/cp-kafka-connect
     container_name: 'connect_1'
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8083 || exit1"]
@@ -112,8 +111,6 @@ services:
     volumes:
             #- ./vol-kafka-connect-jar:/etc/kafka-connect/jars
       - ./vol-kafka-connect-conf:/etc/kafka-connect/connectors
-        #- ./vol-kafka-connect-jar/kafka-connect-cassandra-sink-*.jar:/usr/local/share/kafka/plugins
-        #- ./vol-kafka-connect-jar/:/usr/local/share/kafka/plugins
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_PORT: 8083
@@ -139,6 +136,7 @@ services:
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect_1"
       CONNECT_PLUGIN_PATH: "/etc/kafka-connect/jars"
 
+      CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
 
   cassandra-1:
     image: 'cassandra:latest'
