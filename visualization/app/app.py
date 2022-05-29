@@ -20,7 +20,7 @@ app.title = 'Dashboard'
 # session.set_keyspace(keyspace)
 # # session.execute('SELECT * FROM icesheetreport')
 # session.execute('SELECT * FROM icesheetreport')
-
+df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
   
 app.layout = dbc.Container([ 
   
