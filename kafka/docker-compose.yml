@@ -180,7 +180,6 @@ services:
 
   cassandra-1:
     image: 'cassandra:latest'
-    # mem_limit: 4g
     container_name: 'cassandra-1'
     hostname: 'cassandra-1'
     build:
@@ -202,8 +201,11 @@ services:
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_NUM_TOKENS=128
+      - HEAP_NEWSIZE=128M
+      - MAX_HEAP_SIZE=2048M
 
-          #kafka_manager:  # as num of clusters increase, it may be needed
+
+        #kafka_manager:  # as num of clusters increase, it may be needed
           #  image: hlebalbau/kafka-manager:stable
           #  container_name: kakfa-manager
           #  restart: always

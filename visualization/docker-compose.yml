@@ -10,10 +10,11 @@ services:
     ports:
       - 5000:80
     networks:
-      - network 
+      - default
     
 
       
 networks:
-  network:
-    driver: bridge
+  default:
+    external:
+      name: kafka-network
