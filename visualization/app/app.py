@@ -9,7 +9,7 @@ from cassandra.cluster import Cluster
 import dash
 
 # getting conection with cassandra
-cluster = Cluster(['127.0.0.1'], control_connection_timeout=60, port=9042)
+cluster = Cluster(['127.0.0.1'], control_connection_timeout=None)
 session = cluster.connect()
 keyspace = "icesheet_keyspace"
 
