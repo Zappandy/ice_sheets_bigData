@@ -9,7 +9,7 @@ from cassandra.cluster import Cluster
 import dash
 
 # getting conection with cassandra
-cluster = Cluster(['127.0.0.1'],port=9042)
+cluster = Cluster(['127.0.0.1'], control_connection_timeout=None, port=9042)
 session = cluster.connect()
 keyspace = "icesheet_keyspace"
 
@@ -20,7 +20,7 @@ app.title = 'Dashboard'
 session.set_keyspace(keyspace)
 # session.execute('SELECT * FROM icesheetreport')
 session.execute('SELECT * FROM icesheetreport')
-# df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
   
 app.layout = dbc.Container([ 
   
