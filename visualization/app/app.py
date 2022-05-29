@@ -9,16 +9,19 @@ from cassandra.cluster import Cluster
 import dash
 
 #getting conection with cassandra
-cluster = Cluster(['127.0.0.1'],port=9042)
-session = cluster.connect('cassandra-1')
-
+cluster = Cluster(['cassandra'])
+session = cluster.connect()
+keyspace = "icesheet_keyspace"
 
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Dashboard'
   
-session.connect('USE icesheet_keyspace')
-session.execute('SELECT * FROM icesheetreport')
+session.set_keyspace(keyspace)
+# session.execute('SELECT * FROM icesheetreport')
+rows = session.execute('SELECT hemisphere, day, extend, missing FROM icesheetreport')
+for r in rows:
+    print(r.day, r.extend, r.missing)
 
   
 app.layout = dbc.Container([ 
