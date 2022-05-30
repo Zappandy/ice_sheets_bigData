@@ -1,0 +1,19 @@
+FROM python:3.8
+
+WORKDIR /usr/app
+
+RUN mkdir ./data
+# downloading data when building the container is janky. We should probably download it when starting the producer
+# having the data ready is faster for debugging than downloading everytime
+RUN wget https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/pentad/pent_h22-w0-2000m.dat -P ./data
+
+RUN mkdir ./reqs
+COPY ./ocean_heat_producer/requirements.txt ./reqs
+RUN pip install -r reqs/requirements.txt
+
+RUN mkdir ./code
+COPY ./ocean_heat_producer/OceanHeatProducer.py ./code
+COPY ./__init__.py ./code/producers/
+COPY ./BaseProducer.py ./code/producers/
+
+CMD ["python3", "-u", "code/OceanHeatProducer.py", "--input_dir", "./data"]

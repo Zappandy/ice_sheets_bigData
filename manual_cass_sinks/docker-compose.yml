@@ -15,6 +15,20 @@ services:
       CASS_CONF: ./conf/caribou_conf.json
       KAFKA_BROKER_URL: broker:29092
       LISTEN_TO_TOPICS: ${CARIBOU_SPLIT_TOPIC}
+  oceanheatsink:
+    container_name: oceanheatsink
+    build: .
+    environment:
+      CASS_CONF: ./conf/ocean_heat_conf.json
+      KAFKA_BROKER_URL: broker:29092
+      LISTEN_TO_TOPICS: ${OCEAN_HEAT_TOPIC}
+  globaltempsink:
+    container_name: globaltempsink
+    build: .
+    environment:
+      CASS_CONF: ./conf/global_temp_conf.json
+      KAFKA_BROKER_URL: broker:29092
+      LISTEN_TO_TOPICS: ${GLOBAL_TEMP_TOPIC}
 networks:
   default:
     external:

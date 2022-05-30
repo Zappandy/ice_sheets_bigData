@@ -63,7 +63,12 @@ class BaseProducer:
             # control structure
             # ideally this would set the speed and pause values asynchronously in another process for improved
             # performance
-            control_record = self.kafka_control_listener.poll(1)
+            try:
+                control_record = self.kafka_control_listener.poll(1)
+            except json.decoder.JSONDecodeError as e:
+                print(e)
+                print("could not read control command... ignoring")
+                continue
             control = control_record.values()
             if control:
                 for c in control:
@@ -97,3 +102,5 @@ class BaseProducer:
 
             if i % 1000 == 0:
                 print(f"sent messages: {i}")
+
+        print("sent all data, shutting down...")

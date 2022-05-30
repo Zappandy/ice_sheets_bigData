@@ -1,0 +1,19 @@
+FROM python:3.8
+
+WORKDIR /usr/app
+
+RUN mkdir ./data
+# downloading data when building the container is janky. We should probably download it when starting the producer
+# having the data ready is faster for debugging than downloading everytime
+RUN wget https://data.giss.nasa.gov/gistemp/graphs/graph_data/Global_Mean_Estimates_based_on_Land_and_Ocean_Data/graph.txt -P ./data
+
+RUN mkdir ./reqs
+COPY ./global_temp_producer/requirements.txt ./reqs
+RUN pip install -r reqs/requirements.txt
+
+RUN mkdir ./code
+COPY ./global_temp_producer/GlobalTempProducer.py ./code
+COPY ./__init__.py ./code/producers/
+COPY ./BaseProducer.py ./code/producers/
+
+CMD ["python3", "-u", "code/GlobalTempProducer.py", "--input_dir", "./data"]

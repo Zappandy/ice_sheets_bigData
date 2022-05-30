@@ -21,6 +21,26 @@ services:
       TOPIC_NAME: ${CARIBOU_TOPIC}
       CONTROL_TOPIC: ${CONTROL_TOPIC}
 
+  oceanheat:
+    container_name: oceanheat
+    build:
+      context: .
+      dockerfile: ocean_heat_producer/Dockerfile-oceanheat
+    environment:
+      KAFKA_BROKER_URL: broker:29092
+      TOPIC_NAME: ${OCEAN_HEAT_TOPIC}
+      CONTROL_TOPIC: ${CONTROL_TOPIC}
+
+  globaltemp:
+    container_name: globaltemp
+    build:
+      context: .
+      dockerfile: global_temp_producer/Dockerfile-globaltemp
+    environment:
+      KAFKA_BROKER_URL: broker:29092
+      TOPIC_NAME: ${GLOBAL_TEMP_TOPIC}
+      CONTROL_TOPIC: ${CONTROL_TOPIC}
+
 networks:
   default:
     external:

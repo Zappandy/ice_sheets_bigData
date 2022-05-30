@@ -1,0 +1,10 @@
+{
+  "keyspace": "icesheet_keyspace",
+  "cass_url": "cassandra-1",
+  "cass_table": "globaltempreport",
+  "keys_cols": {
+    "year":  "year",
+    "no_smoothing":  "no_smoothing",
+    "lowess_smoothing": "lowess_smoothing"
+  }
+}

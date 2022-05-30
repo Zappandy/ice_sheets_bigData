@@ -1,0 +1,14 @@
+{
+  "keyspace": "icesheet_keyspace",
+  "cass_url": "cassandra-1",
+  "cass_table": "oceanheatreport",
+  "keys_cols": {
+    "year":  "year",
+    "wo":  "wo",
+    "wose":  "wose",
+    "nh": "nh",
+    "nhse": "nhse",
+    "sh":  "sh",
+    "shse": "shse"
+  }
+}

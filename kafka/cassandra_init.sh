@@ -12,6 +12,8 @@ CQL="DROP KEYSPACE IF EXISTS icesheet_keyspace;
      CREATE TABLE icesheetreport(\"rec_id\" UUID PRIMARY KEY, \"Year\" INT, \"Month\" INT, \"Day\" INT,
      \"Extent\" FLOAT, \"Missing\" FLOAT, \"Hemisphere\" TEXT);
      CREATE TABLE cariboureport(\"rec_id\" UUID PRIMARY KEY, \"Year\" INT, location TEXT, population_count FLOAT);
+     CREATE TABLE oceanheatreport(\"rec_id\" UUID PRIMARY KEY, year FLOAT, wo FLOAT, wose FLOAT, nh FLOAT, nhse FLOAT, sh FLOAT, shse FLOAT);
+     CREATE TABLE globaltempreport(\"rec_id\" UUID PRIMARY KEY, year INT, no_smoothing FLOAT, lowess_smoothing FLOAT);
      "
 until echo $CQL | cqlsh; do
 	  echo "cqlsh: Cassandra is unavailable to initialize - will retry later"
