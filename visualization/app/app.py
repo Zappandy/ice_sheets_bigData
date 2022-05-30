@@ -50,8 +50,22 @@ def num_records(consum, n=1000):
     #     if i == 30:
     #         break
     records = consum.poll(n*5)
-    multiple_streams = [stream.value for stream in records]
+    multiple_streams = list(records.values())
+    multiple_streams = [stream.value for stream in multiple_streams]
     return multiple_streams
+
+    # try:
+    #     records = self.consumer.poll(1000 * 5)
+    #     elms = list(records.values())[0]
+    # except Exception as e:
+    #     print("error polling records")
+    #     print(e)
+    #     continue
+    # print(len(elms))
+    # for cur_rec in elms:
+    #     cur_elm = cur_rec.value
+
+
 
 # define a key
 
