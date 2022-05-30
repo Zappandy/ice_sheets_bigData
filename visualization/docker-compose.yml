@@ -1,18 +1,21 @@
 version: '3.7'
-services:
 
+services:
   dashboard:
-    build: 
-      context: ./
     container_name: icesheetviz
     hostname: icesheetviz
-    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #restart: always
     ports:
       - 5000:80
     networks:
       - default
-    
-
+    environment:
+      - KAFKA_BROKER_URL=broker:29092
+      - LISTEN_TO_TOPICS=${ICE_SHEET_TOPIC}
+      - LISTENER_TIMEOUT=6000    
       
 networks:
   default:
