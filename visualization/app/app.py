@@ -57,7 +57,6 @@ def num_records(consum, n=1000):
     return multiple_streams
 
 # define a key
-
 icesheet_df = pd.DataFrame.from_records(num_records(consumer))
 
 # heatmap = px.imshow([extension])
@@ -65,6 +64,9 @@ icesheet_df = pd.DataFrame.from_records(num_records(consumer))
 if icesheet_df.empty:
     print("can't enter yet...")
 
+    icesheet_df = pd.DataFrame.from_dict({"Hemisphere": ['N', 'S'], "Year": [0, 0],
+                                          "Month": [0, 0], "Day": [0, 0],
+                                          "Extent": [0.0, 0.0], "Missing": [0.0, 0.0]})
 else:
     print("entering...")
     mask_df = icesheet_df["Hemisphere"] == 'N'
