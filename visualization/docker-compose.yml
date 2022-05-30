@@ -14,7 +14,8 @@ services:
       dockerfile: Dockerfile
     #restart: always
     ports:
-      - 5000:80
+       - 80:5050
+#      - 80:5050
     networks:
       - default
     environment:

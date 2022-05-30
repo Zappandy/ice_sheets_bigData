@@ -21,7 +21,8 @@ sys.path.append(os.path.abspath('../'))
 #cluster = Cluster(['cassandra-1'])
 #session =  cluster.connect()
 
-app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
+#app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
+app = dash.Dash()
 app.title = 'Icesheets_Dashboard'
 
 #session.set_keyspace(keyspace)
@@ -126,5 +127,5 @@ else:
 
 
 if __name__=='__main__':
-     app.run_server(debug=True)
-     #app.run_server(host='0.0.0.0:80', port=5000, debug=True)
+     #app.run_server(port=5000, debug=True)
+     app.run_server(host='0.0.0.0', port=5000, debug=True)
