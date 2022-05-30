@@ -28,7 +28,7 @@ Sometimes the message broker container does not start up correctly. Simply check
 docker ps
 docker-compose -f kafka/docker-compose.yml run -d broker init-kafka
 ```
-again and it should start up without problems.
+and it should start up without problems.
 Wait a couple of minutes, until everything is running (cassandra is slow to start up)
 
 Finally, set up the other components of the stream processing system
