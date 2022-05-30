@@ -1,3 +1,5 @@
+import datetime
+
 from dash.dependencies import Output, Input, State
 from kafka import KafkaConsumer
 import dash_bootstrap_components as dbc
@@ -36,11 +38,19 @@ LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
 #TOPIC_NAME = os.environ.get("TOPIC_NAME")
 
+X_ice_extent = list()
+Y_ice_extent = list()
+X_ice_pred = list()
+Y_ice_pred = list()
   
 consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
                          bootstrap_servers=[KAFKA_BROKER_URL],
-                         consumer_timeout_ms=LISTENER_TIMEOUT,
                          value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
+
+consumer2 = KafkaConsumer("icesheetspred", group_id="raw_streams",
+                         bootstrap_servers=[KAFKA_BROKER_URL],
+                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
+
 
 def num_records(consum, n=1000):
     #multiple_streams = []
@@ -48,8 +58,11 @@ def num_records(consum, n=1000):
     #     multiple_streams.append(msg.value)
     #     if i == 30:
     #         break
-    records = consum.poll(n*5)
-    multiple_streams = list(records.values())
+    try:
+        records = consum.poll(10)
+        multiple_streams = list(records.values())
+    except Exception:
+        return None
     try:
         multiple_streams = [stream.value for stream in multiple_streams[0]]
     except IndexError:
@@ -67,7 +80,53 @@ if icesheet_df.empty:
     icesheet_df = pd.DataFrame.from_dict({"Hemisphere": ['N', 'S'], "Year": [0, 0],
                                           "Month": [0, 0], "Day": [0, 0],
                                           "Extent": [0.0, 0.0], "Missing": [0.0, 0.0]})
-else:
+
+
+app.layout = dbc.Container([
+
+    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
+
+    dbc.Row(dbc.Col(dcc.Loading(
+        children=[dcc.Graph(id='north_extension', animate=True),
+                  dcc.Interval(
+                            id='interval-component',
+                            interval=1*5000, # in milliseconds
+                            n_intervals=0
+                        )
+                  ],
+        style={'width': '49%', 'display': 'inline-block'})))
+])
+
+# Multiple components can update everytime interval gets fired.
+@app.callback(Output('north_extension', 'figure'),
+              Input('interval-component', 'n_intervals'))
+def update_graph_live(n):
+    # kafka consumer goes here
+    new_data = num_records(consumer)
+
+    print(new_data)
+    X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
+    Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
+
+
+
+    data = go.Scatter(
+        x=list(X_ice_extent),
+        y=list(Y_ice_extent),
+        name='Scatter',
+        mode='lines+markers'
+    )
+
+    return {'data': [data], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
+                                                yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]),
+                                                )}
+
+if __name__=='__main__':
+     #app.run_server(port=5000, debug=True)
+     #app.run_server(host='0.0.0.0', port=5000, debug=True)
+     app.run_server()
+"""
+# Create the graph with subplots
     print("entering...")
     mask_df = icesheet_df["Hemisphere"] == 'N'
     north_df = icesheet_df[mask_df]
@@ -78,44 +137,9 @@ else:
     months = north_df["Month"].tolist()
     days = north_df["Day"].tolist()
     fig_heatmap = go.Figure(data=go.Heatmap(
-              x=months,
-              y=years,
-              z=extension,
-              type = 'heatmap',
-              colorscale = 'Viridis'))
-
-    app.layout = dbc.Container([
-
-        dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
-
-        # dbc.Row(dbc.Col(dcc.Loading(children=[dcc.Graph(id ='your-graph'),
-        #                                     dcc.Slider(id='year-slider',
-        #                                                 min=df['year'].min(),
-        #                                                 max=df['year'].max(),
-        #                                                 value=df['year'].min(),
-        #                                                 marks={str(year): str(year) for year in df['year'].unique()},
-        #                                                 step=None)
-        #                                     ], color = '#000000', type = 'dot', fullscreen=True ) )),
-    dbc.Row(dbc.Col(dcc.Loading(
-        children=[dcc.Graph(id='north_extension', figure=fig_heatmap)], style={'width': '49%', 'display': 'inline-block' })))
-    ])
-
-    @app.callback(
-        Output('your-graph', 'figure'),
-        Input('year-slider', 'value'))
-    def update_figure(selected_year):
-        filtered_df = df[df.year == selected_year]
-
-        fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                        size="pop", color="continent", hover_name="country",
-                        log_x=True, size_max=55)
-
-        fig.update_layout(transition_duration=500)
-
-        return fig
-
-
-if __name__=='__main__':
-     #app.run_server(port=5000, debug=True)
-     #app.run_server(host='0.0.0.0', port=5000, debug=True)
-     app.run_server()
+        x=months,
+        y=years,
+        z=extension,
+        type='heatmap',
+        colorscale='Viridis'))
+    return fig_heatmap"""
