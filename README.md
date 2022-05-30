@@ -21,22 +21,22 @@ This can take a while as the data sources are downloaded to the images when buil
 First, start the message broker and the database by running
 
 ```
-docker-compose -f kafka/docker-compose.yml run -d 
+docker-compose -f kafka/docker-compose.yml up -d 
 ```
 Sometimes the message broker container does not start up correctly. Simply check if it is running and then restart if necessary
 ```
 docker ps
-docker-compose -f kafka/docker-compose.yml run -d broker init-kafka
+docker-compose -f kafka/docker-compose.yml up -d broker init-kafka
 ```
 and it should start up without problems.
 Wait a couple of minutes, until everything is running (cassandra is slow to start up)
 
 Finally, set up the other components of the stream processing system
 ```
-docker-compose -f consumers/caribou_split_processor/docker-compose.yml run -d
-docker-compose -f consumers/ice_sheets_predictor/docker-compose.yml run -d
-docker-compose -f manual_cass_sinks/docker-compose.yml run -d
-docker-compose -f producers/docker-compose.yml run -d
+docker-compose -f consumers/caribou_split_processor/docker-compose.yml up -d
+docker-compose -f consumers/ice_sheets_predictor/docker-compose.yml up -d
+docker-compose -f manual_cass_sinks/docker-compose.yml up -d
+docker-compose -f producers/docker-compose.yml up -d
 ```
 
 The producers start streaming messages immediately on startup.
