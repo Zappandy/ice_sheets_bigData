@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  icesheetsink:
+    container_name: icesheetsink
+    build: .
+    environment:
+      CASS_CONF: ./conf/ice_sheet_conf.json
+      KAFKA_BROKER_URL: broker:29092
+      LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
+networks:
+  default:
+    external:
+      name: kafka-network
