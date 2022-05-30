@@ -23,8 +23,7 @@ First, start the message broker and the database by running
 ```
 docker-compose -f kafka/docker-compose.yml run -d 
 ```
-Sometimes the message broker container does not start up correctly. Simply run
-check if it is running
+Sometimes the message broker container does not start up correctly. Simply check if it is running and then restart if necessary
 ```
 docker ps
 docker-compose -f kafka/docker-compose.yml run -d broker init-kafka
@@ -43,6 +42,6 @@ docker-compose -f producers/docker-compose.yml run -d
 The producers start streaming messages immediately on startup.
 
 If you want to control the producers, there is a control topic registered with kafka.
-By sending commands to this topic, the producers can be stopped and their speed can be adjusted:
-Some example commands are listed in the README under the producers directory: ![producers/README.md].
+By sending commands to this topic, the producers can be stopped and their speed can be adjusted.
+Some example commands are listed in the README under the producers directory: !(README)[producers/README.md].
 In order to use them, run a local kafka-console-producer and send the JSON commands to the "control" topic.
