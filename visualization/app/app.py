@@ -11,6 +11,7 @@ from flask import Flask
 import pandas as pd
 from cassandra.cluster import Cluster
 import dash
+import plotly.graph_objects as go
 
 sys.path.append(os.path.abspath('../'))
 # getting conection with cassandra
@@ -57,11 +58,23 @@ north_df = icesheet_df[mask_df]
 south_df = icesheet_df[~mask_df]
 #for i, msg in enumerate(consumer):
 #    print(f"{msg.topic}, {msg.partition}, {msg.offset}, {msg.key}, {msg.value}")  # year, month, day, extend, missing, hemisphere
-extension = north_df["Extent"].tolist()
-years = north_df["Year"].tolist()
-months = north_df["Month"].tolist()
+# extension = north_df["Extent"].tolist()
+# years = north_df["Year"].tolist()
+# months = north_df["Month"].tolist()
 
-heatmap = px.imshow([extension]) 
+# heatmap = px.imshow([extension]) 
+# fig_heatmap = go.Figure(data=go.Heatmap(
+#           x = years,
+#           y = methds,
+            # z = extension
+#           type = 'heatmap',
+#           colorscale = 'Viridis'))
+fig_heatmap = go.Figure(data=go.Heatmap(
+          x=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          y=['Morning', 'Afternoon', 'Evening'],
+          z=[[1, None, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
+          type = 'heatmap',
+          colorscale = 'Viridis'))
 
 app.layout = dbc.Container([
   
@@ -76,7 +89,7 @@ app.layout = dbc.Container([
     #                                                 step=None)
     #                                     ], color = '#000000', type = 'dot', fullscreen=True ) )),
 dbc.Row(dbc.Col(dcc.Loading(
-    children=[dcc.Graph(id='north_extension', figure=heatmap)], style={'width': '49%', 'display': 'inline-block' })))
+    children=[dcc.Graph(id='north_extension', figure=fig_heatmap)], style={'width': '49%', 'display': 'inline-block' })))
 ])
   
 @app.callback(
@@ -92,6 +105,7 @@ def update_figure(selected_year):
     fig.update_layout(transition_duration=500)
   
     return fig
+
   
 if __name__=='__main__':
      app.run_server()
