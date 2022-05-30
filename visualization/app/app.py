@@ -52,7 +52,6 @@ def num_records(consum, n):
 # define a key
 elms = num_records(consumer, 1000)
 icesheet_df = pd.DataFrame.from_records([el.value for el in elms])
-print("tito")
 mask_df = icesheet_df["Hemisphere"] == 'N'
 north_df = icesheet_df[mask_df]
 south_df = icesheet_df[~mask_df]
@@ -63,12 +62,7 @@ south_df = icesheet_df[~mask_df]
 # months = north_df["Month"].tolist()
 
 # heatmap = px.imshow([extension]) 
-# fig_heatmap = go.Figure(data=go.Heatmap(
-#           x = years,
-#           y = methds,
-            # z = extension
-#           type = 'heatmap',
-#           colorscale = 'Viridis'))
+print(icesheet_df.head(10))
 fig_heatmap = go.Figure(data=go.Heatmap(
           x=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
           y=['Morning', 'Afternoon', 'Evening'],
