@@ -58,14 +58,15 @@ icesheet_df = pd.DataFrame.from_records(num_records(consumer))
 print(icesheet_df.empty)
 print(icesheet_df.head(10))
 print(icesheet_df.shape)
-#mask_df = icesheet_df["Hemisphere"] == 'N'
-#north_df = icesheet_df[mask_df]
-#south_df = icesheet_df[~mask_df]
+mask_df = icesheet_df["Hemisphere"] == 'N'
+north_df = icesheet_df[mask_df]
+south_df = icesheet_df[~mask_df]
 
 
-# extension = north_df["Extent"].tolist()
-# years = north_df["Year"].tolist()
-# months = north_df["Month"].tolist()
+extension = north_df["Extent"].tolist()
+years = north_df["Year"].tolist()
+months = north_df["Month"].tolist()
+days = north_df["Day"].tolist()
 
 # heatmap = px.imshow([extension])
 #print(icesheet_df.head(10))
@@ -75,9 +76,9 @@ if icesheet_df.empty:
 else:
     print("entering...")
     fig_heatmap = go.Figure(data=go.Heatmap(
-              x=[i for i in range(1, 30)],
-              y=[i for i in range(1, 12)],
-              z=[5, 14, 8],
+              x=days,
+              y=months,
+              z=extension,
               type = 'heatmap',
               colorscale = 'Viridis'))
 
