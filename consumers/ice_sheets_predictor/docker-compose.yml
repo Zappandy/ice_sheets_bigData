@@ -10,7 +10,7 @@ services:
       LISTENER_TIMEOUT: 60000
       LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
       TOPIC_NAME: ${ICE_SHEET_PRED_TOPIC}
-      POLY_DEGREE: 5
+      POLY_DEGREE: 2
 
 networks:
   default:

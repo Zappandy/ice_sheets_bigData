@@ -47,8 +47,7 @@ class IceSheetsPredictor:
 
     def create_model(self):
         import numpy as np
-        model = Pipeline([('poly', PolynomialFeatures(degree=int(self.poly_degree))),
-                          ('linear', LinearRegression(fit_intercept=False))])
+        model = LinearRegression()
         return model
 
     def processing_loop(self):
