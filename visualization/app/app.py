@@ -45,16 +45,22 @@ consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
                          consumer_timeout_ms=LISTENER_TIMEOUT,
                          value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 
-def num_records(consum, n):
-    records = consum.poll(n*5)
-    return list(records.values())[0]
+def num_records(consum, n=1000):
+    for i, msg in enumerate(consum):
+        print(f"{msg.topic}, {msg.partition}, {msg.offset}, {msg.key}, {msg.value}")
+        print(f"{type(msg.topic)}, {type(msg).partition}, {type(msg).offset}, {type(msg).key}, {type(msg).value}")
+        if i == 30:
+            break
+        # records = consum.poll(n*5)
+    # return list(records.values())[0]
 
 # define a key
-elms = num_records(consumer, 1000)
-icesheet_df = pd.DataFrame.from_records([el.value for el in elms])
-mask_df = icesheet_df["Hemisphere"] == 'N'
-north_df = icesheet_df[mask_df]
-south_df = icesheet_df[~mask_df]
+elms = num_records(consumer)
+#icesheet_df = pd.DataFrame.from_records([el.value for el in elms])
+#mask_df = icesheet_df["Hemisphere"] == 'N'
+#north_df = icesheet_df[mask_df]
+#south_df = icesheet_df[~mask_df]
+
 #for i, msg in enumerate(consumer):
 #    print(f"{msg.topic}, {msg.partition}, {msg.offset}, {msg.key}, {msg.value}")  # year, month, day, extend, missing, hemisphere
 # extension = north_df["Extent"].tolist()
@@ -62,11 +68,12 @@ south_df = icesheet_df[~mask_df]
 # months = north_df["Month"].tolist()
 
 # heatmap = px.imshow([extension]) 
-print(icesheet_df.head(10))
+#print(icesheet_df.head(10))
+
 fig_heatmap = go.Figure(data=go.Heatmap(
-          x=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          y=['Morning', 'Afternoon', 'Evening'],
-          z=[[1, None, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
+          x=[i for i in range(1, 30)],
+          y=[i for i in range(1, 12)],
+          z=[5, 14, 8],
           type = 'heatmap',
           colorscale = 'Viridis'))
 
