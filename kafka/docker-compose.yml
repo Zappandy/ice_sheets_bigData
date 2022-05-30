@@ -47,7 +47,6 @@ services:
   init-kafka:
       image: confluentinc/cp-kafka:latest
       container_name: init-kafka
-      #image: confluentinc/cp-kafka:6.1.1
       depends_on:
         - broker
       entrypoint: [ '/bin/sh', '-c' ]
@@ -97,23 +96,6 @@ services:
       - CASSANDRA_NUM_TOKENS=128
       - HEAP_NEWSIZE=128M
       - MAX_HEAP_SIZE=2048M
-
-
-        #kafka_manager:  # as num of clusters increase, it may be needed
-          #  image: hlebalbau/kafka-manager:stable
-          #  container_name: kakfa-manager
-          #  restart: always
-          #  ports:
-          #    - 9000:9000
-          #  networks:
-          #    - default
-          #  environment:
-          #    ZK_HOSTS: "zookeeper:2181"
-          #    APPLICATION_SECRET: "random-secret"
-          #    KAFKA_MANAGER_AUTH_ENABLED: "true"
-          #    KAFKA_MANAGER_USERNAME: admin
-          #    KAFKA_MANAGER_PASSWORD: smellycat
-          #  command: -Dpidfile.path=/dev/null
 
 
 networks:
