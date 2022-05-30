@@ -44,12 +44,12 @@ consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
                          value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 
 def num_records(consum, n=1000):
-    multiple_streams = []
-    for i, msg in enumerate(consum):
-        multiple_streams.append(msg.value)
-        if i == 30:
-            break
-        # records = consum.poll(n*5)
+    #multiple_streams = []
+    # for i, msg in enumerate(consum):
+    #     multiple_streams.append(msg.value)
+    #     if i == 30:
+    #         break
+    records = consum.poll(n*5)
     return multiple_streams
 
 # define a key
@@ -76,8 +76,8 @@ if icesheet_df.empty:
 else:
     print("entering...")
     fig_heatmap = go.Figure(data=go.Heatmap(
-              x=days,
-              y=months,
+              x=months,
+              y=years,
               z=extension,
               type = 'heatmap',
               colorscale = 'Viridis'))
