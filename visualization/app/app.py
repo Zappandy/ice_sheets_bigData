@@ -41,7 +41,7 @@ LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
                          bootstrap_servers=[KAFKA_BROKER_URL],
                          consumer_timeout_ms=LISTENER_TIMEOUT,
-                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))
+                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
 
 def num_records(consum, n=1000):
     #multiple_streams = []
@@ -50,23 +50,12 @@ def num_records(consum, n=1000):
     #     if i == 30:
     #         break
     records = consum.poll(n*5)
+    multiple_streams = [stream.value for stream in records]
     return multiple_streams
 
 # define a key
 
 icesheet_df = pd.DataFrame.from_records(num_records(consumer))
-print(icesheet_df.empty)
-print(icesheet_df.head(10))
-print(icesheet_df.shape)
-mask_df = icesheet_df["Hemisphere"] == 'N'
-north_df = icesheet_df[mask_df]
-south_df = icesheet_df[~mask_df]
-
-
-extension = north_df["Extent"].tolist()
-years = north_df["Year"].tolist()
-months = north_df["Month"].tolist()
-days = north_df["Day"].tolist()
 
 # heatmap = px.imshow([extension])
 #print(icesheet_df.head(10))
@@ -75,6 +64,14 @@ if icesheet_df.empty:
 
 else:
     print("entering...")
+    mask_df = icesheet_df["Hemisphere"] == 'N'
+    north_df = icesheet_df[mask_df]
+    south_df = icesheet_df[~mask_df]
+
+    extension = north_df["Extent"].tolist()
+    years = north_df["Year"].tolist()
+    months = north_df["Month"].tolist()
+    days = north_df["Day"].tolist()
     fig_heatmap = go.Figure(data=go.Heatmap(
               x=months,
               y=years,
