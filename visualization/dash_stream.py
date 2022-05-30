@@ -23,7 +23,7 @@ import dash
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Icesheets_Dashboard'
-  
+
 #session.set_keyspace(keyspace)
 #session.execute('SELECT * FROM icesheetreport')
 
@@ -51,11 +51,9 @@ def num_records(consum, n):
 elms = num_records(consumer, 1000)
 icesheet_df = pd.DataFrame.from_records([el.value for el in elms])
 print("tito")
-print(icesheet_df.head(10))
 mask_df = icesheet_df["Hemisphere"] == 'N'
 north_df = icesheet_df[mask_df]
 south_df = icesheet_df[~mask_df]
-print("jiji")
 #for i, msg in enumerate(consumer):
 #    print(f"{msg.topic}, {msg.partition}, {msg.offset}, {msg.key}, {msg.value}")  # year, month, day, extend, missing, hemisphere
 extension = north_df["Extent"].tolist()
@@ -66,7 +64,7 @@ heatmap = px.imshow([extension])
 
 app.layout = dbc.Container([
   
-    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style = {'textAlign': 'center', 'paddingBottom': '1%'}),
+    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
   
     # dbc.Row(dbc.Col(dcc.Loading(children=[dcc.Graph(id ='your-graph'),
     #                                     dcc.Slider(id='year-slider',
@@ -96,4 +94,5 @@ def update_figure(selected_year):
   
 if __name__=='__main__':
      #app.run_server()
-     app.run_server(host='0.0.0.0:80', port=5000, debug=True)
+     app.run_server(port=80, debug=True)
+     #app.run_server(host='0.0.0.0:80', port=5000, debug=True)
