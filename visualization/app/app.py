@@ -7,7 +7,6 @@ import dash_html_components as html
 import plotly.express as px
 import os, os.path, sys
 import json
-from flask import Flask
 import pandas as pd
 from cassandra.cluster import Cluster
 import dash
@@ -22,8 +21,7 @@ sys.path.append(os.path.abspath('../'))
 #cluster = Cluster(['cassandra-1'])
 #session =  cluster.connect()
 
-server = Flask(__name__)
-app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
+app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Icesheets_Dashboard'
 
 #session.set_keyspace(keyspace)
