@@ -1,8 +1,0 @@
-FROM confluentinc/cp-kafka-connect:latest
-# latest or 7.1.1
-WORKDIR /etc/kafka-connect/jars
-RUN curl -O -L "https://downloads.datastax.com/kafka/kafka-connect-cassandra-sink.tar.gz" \
-&& tar -zxf kafka-connect-cassandra-sink.tar.gz \
-&& rm kafka-connect-cassandra-sink.tar.gz 
-#&& cp kafka-connect-cassandra-sink-* /usr/local/share/kafka/plugins \
-#RUN cp -r kafka-connect-cassandra-sink-* /etc/kafka-connect/jars
