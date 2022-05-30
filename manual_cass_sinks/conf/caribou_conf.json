@@ -1,0 +1,10 @@
+{
+  "keyspace": "icesheet_keyspace",
+  "cass_url": "cassandra-1",
+  "cass_table": "cariboureport",
+  "keys_cols": {
+    "Year": "Year",
+    "location": "location",
+    "population_count": "population_count"
+  }
+}

@@ -6,4 +6,4 @@ ADD ./requirements.txt ./
 RUN pip install -r requirements.txt
 ADD ./ ./
 
-CMD ["python3", "-u", "IceSheetsDiffProcessor.py"]
+CMD ["python3", "-u", "Caribou_Split_Processor.py"]
