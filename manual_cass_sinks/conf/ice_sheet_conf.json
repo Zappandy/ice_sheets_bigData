@@ -1,0 +1,13 @@
+{
+  "keyspace": "icesheet_keyspace",
+  "cass_url": "cassandra-1",
+  "cass_table": "icesheetreport",
+  "keys_cols": {
+    "Hemisphere": "Hemisphere",
+    "Day": "Day",
+    "Extent": "Extent",
+    "Missing": "Missing",
+    "Month": "Month",
+    "Year": "Year"
+  }
+}
