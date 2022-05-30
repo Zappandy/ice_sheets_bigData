@@ -16,7 +16,7 @@ docker-compose -f consumers/ice_sheets_predictor/docker-compose.yml build
 docker-compose -f manual_cass_sinks/docker-compose.yml build
 (docker-compose-f visualization/docker-compose build)
 ```
-This can take a while as the data sources are downloaded to the images when building.
+This can take a while as the data sources are downloaded to the images when building. If there's warnings about variables not being set, pass the flag **--env-file .env**, this is a must if running from WSL and not in Unix-based systems. This has not been tested with VMs.
 
 First, start the message broker and the database by running
 
