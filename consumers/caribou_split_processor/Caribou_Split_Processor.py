@@ -62,7 +62,7 @@ class CaribouSplitProcessor:
                     out_elm = {
                         "Year": cur_year,
                         "location": location,
-                        "population_count": pop_count
+                        "population_count": pop_count if type(pop_count) == float else None
                     }
 
                     print("sending...")
