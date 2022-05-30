@@ -23,6 +23,8 @@ class CaribouProducer(BaseProducer):
         print("loading data...")
         # could be swapped to streaming from disk. Then, without using pandas
         df = pd.read_excel(f"{self.data_source.rstrip('/')}/03_Tab01_CaribouFInal.xlsx")
+        df.columns = [c.strip() for c in df.columns]
+        df['population_count'] = df['population_count'].astype(float)
         self.key = "Year"
         return df
 

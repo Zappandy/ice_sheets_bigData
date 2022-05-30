@@ -44,13 +44,15 @@ class CassandraSink:
 
     def run_sink(self):
         data_mapping = ", ".join([f"%({k})s" for k in self.topic_keys])
-        cols = ['"' + c + '"' for c in self.cass_cols]
-        insert_statement = f"INSERT INTO  {self.cass_table} ({', '.join(cols)}) VALUES ({data_mapping})"
+        cols = ['"' + cc + '"' for cc in self.cass_cols]
+        # https://stackoverflow.com/questions/17945341/how-to-auto-generate-uuid-in-cassandra-cql-3-command-line
+        # expects rec_id in every table and adds a UUID for it
+        insert_statement = f"INSERT INTO  {self.cass_table} (rec_id, {', '.join(cols)}) VALUES (uuid(), {data_mapping})"
         print(data_mapping)
         print(insert_statement)
         for msg in self.consumer:
             vals = msg.value
-            vals_ordered = {k:vals[k] for k in self.topic_keys}
+            vals_ordered = {k: vals[k] for k in self.topic_keys}
             print(vals)
             self.cassandra_session.execute(insert_statement, vals_ordered)
 

@@ -8,7 +8,7 @@ LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 TOPIC_NAME = os.environ.get("TOPIC_NAME")
 
 
-class IceSheetsDiffProcessor:
+class CaribouSplitProcessor:
     def __init__(self):
         self.server = KAFKA_BROKER_URL
         self.listen_to_topics = LISTEN_TO_TOPICS
@@ -67,11 +67,11 @@ class IceSheetsDiffProcessor:
 
                     print("sending...")
                     # TODO test with topic=self.topic
-                    self.producer.send(topic=self.topic, value=out_elm, key=str(cur_elm[self.key]))
+                    self.producer.send(topic=self.topic, value=out_elm, key=str(out_elm[self.key]))
                     print(out_elm)
 
 
 if __name__ == "__main__":
-    processor = IceSheetsDiffProcessor()
+    processor = CaribouSplitProcessor()
     processor.processing_loop()
 

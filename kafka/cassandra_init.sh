@@ -9,8 +9,9 @@ CQL="DROP KEYSPACE IF EXISTS icesheet_keyspace;
      CREATE KEYSPACE icesheet_keyspace
      WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
      USE icesheet_keyspace;
-     CREATE TABLE icesheetreport(\"Year\" INT, \"Month\" INT, \"Day\" INT,
-     \"Extent\" FLOAT, \"Missing\" FLOAT, \"Hemisphere\" TEXT, PRIMARY KEY (\"Hemisphere\"));
+     CREATE TABLE icesheetreport(\"rec_id\" UUID PRIMARY KEY, \"Year\" INT, \"Month\" INT, \"Day\" INT,
+     \"Extent\" FLOAT, \"Missing\" FLOAT, \"Hemisphere\" TEXT);
+     CREATE TABLE cariboureport(\"rec_id\" UUID PRIMARY KEY, \"Year\" INT, location TEXT, population_count FLOAT);
      "
 until echo $CQL | cqlsh; do
 	  echo "cqlsh: Cassandra is unavailable to initialize - will retry later"

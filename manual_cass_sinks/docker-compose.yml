@@ -8,6 +8,13 @@ services:
       CASS_CONF: ./conf/ice_sheet_conf.json
       KAFKA_BROKER_URL: broker:29092
       LISTEN_TO_TOPICS: ${ICE_SHEET_TOPIC}
+  caribousink:
+    container_name: caribousink
+    build: .
+    environment:
+      CASS_CONF: ./conf/caribou_conf.json
+      KAFKA_BROKER_URL: broker:29092
+      LISTEN_TO_TOPICS: ${CARIBOU_SPLIT_TOPIC}
 networks:
   default:
     external:
