@@ -15,7 +15,7 @@ services:
     environment:
       - KAFKA_BROKER_URL=broker:29092
       - LISTEN_TO_TOPICS=${ICE_SHEET_TOPIC}
-      - LISTENER_TIMEOUT=6000    
+      - LISTENER_TIMEOUT=6000
       
 networks:
   default:
