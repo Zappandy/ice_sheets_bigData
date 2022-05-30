@@ -43,5 +43,5 @@ The producers start streaming messages immediately on startup.
 
 If you want to control the producers, there is a control topic registered with kafka.
 By sending commands to this topic, the producers can be stopped and their speed can be adjusted.
-Some example commands are listed in the README under the producers directory: !(README)[producers/README.md].
+Some example commands are listed in the README under the producers directory: ![README](producers/README.md).
 In order to use them, run a local kafka-console-producer and send the JSON commands to the "control" topic.
