@@ -1,6 +1,5 @@
 from dash.dependencies import Output, Input, State
 from kafka import KafkaConsumer
-#from chart_studio.plotly import plot, iplot  for online/cloud plots
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -56,19 +55,6 @@ def num_records(consum, n=1000):
     except IndexError:
         print("communicating with streams...")
     return multiple_streams
-
-    # try:
-    #     records = self.consumer.poll(1000 * 5)
-    #     elms = list(records.values())[0]
-    # except Exception as e:
-    #     print("error polling records")
-    #     print(e)
-    #     continue
-    # print(len(elms))
-    # for cur_rec in elms:
-    #     cur_elm = cur_rec.value
-
-
 
 # define a key
 
