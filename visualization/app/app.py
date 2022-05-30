@@ -13,6 +13,8 @@ import pandas as pd
 from cassandra.cluster import Cluster
 import dash
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 
 sys.path.append(os.path.abspath('../'))
 # getting conection with cassandra
@@ -40,52 +42,43 @@ LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
 X_ice_extent = list()
 Y_ice_extent = list()
-X_ice_pred = list()
-Y_ice_pred = list()
   
 consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
                          bootstrap_servers=[KAFKA_BROKER_URL],
                          value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
 
-consumer2 = KafkaConsumer("icesheetspred", group_id="raw_streams",
-                         bootstrap_servers=[KAFKA_BROKER_URL],
-                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
-
-
 def num_records(consum, n=1000):
-    #multiple_streams = []
-    # for i, msg in enumerate(consum):
-    #     multiple_streams.append(msg.value)
-    #     if i == 30:
-    #         break
     try:
-        records = consum.poll(10)
-        multiple_streams = list(records.values())
-    except Exception:
-        return None
+        records = consum.poll(1000 * 5)
+        elms = list(records.values())
+    except Exception as e:
+        print("error polling records")
+        print(e)
+        elms = list()
     try:
-        multiple_streams = [stream.value for stream in multiple_streams[0]]
-    except IndexError:
+        multiple_streams = [stream.value for stream in elms]
+    except IndexError as e:
         print("communicating with streams...")
     return multiple_streams
 
 # define a key
-icesheet_df = pd.DataFrame.from_records(num_records(consumer))
+# icesheet_df = pd.DataFrame.from_records(num_records(consumer))
 
 # heatmap = px.imshow([extension])
 #print(icesheet_df.head(10))
-if icesheet_df.empty:
+
+"""if icesheet_df.empty:
     print("can't enter yet...")
 
     icesheet_df = pd.DataFrame.from_dict({"Hemisphere": ['N', 'S'], "Year": [0, 0],
                                           "Month": [0, 0], "Day": [0, 0],
                                           "Extent": [0.0, 0.0], "Missing": [0.0, 0.0]})
+"""
 
 
 app.layout = dbc.Container([
 
     dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
-
     dbc.Row(dbc.Col(dcc.Loading(
         children=[dcc.Graph(id='north_extension', animate=True),
                   dcc.Interval(
@@ -97,49 +90,55 @@ app.layout = dbc.Container([
         style={'width': '49%', 'display': 'inline-block'})))
 ])
 
+"""
+dbc.Row(dbc.Col(dcc.Loading(
+    children=[dcc.Graph(id='north_preds', animate=True),
+              dcc.Interval(
+                        id='interval-component2',
+                        interval=1*5000, # in milliseconds
+                        n_intervals=0
+                    )
+              ],
+"""
+
 # Multiple components can update everytime interval gets fired.
 @app.callback(Output('north_extension', 'figure'),
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):
     # kafka consumer goes here
     new_data = num_records(consumer)
-
-    print(new_data)
+    print(len(new_data))
     X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
     Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
 
-
-
-    data = go.Scatter(
+    trace1 = go.Scatter(
         x=list(X_ice_extent),
         y=list(Y_ice_extent),
         name='Scatter',
         mode='lines+markers'
     )
 
-    return {'data': [data], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
-                                                yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]),
-                                                )}
+    return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
+                                                yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
+
+"""
+@app.callback(Output('north_preds', 'figure'),
+              Input('interval-component2', 'n_intervals'))
+def update_preds_live():
+    new_data_pre = num_records(consumer2)
+    print(len(new_data_pre))
+    X_ice_pred, Y_ice_pred = zip(*[(datetime.date(p["Year"], p["Month"], p["Day"]), p["pred"]) for p in new_data_pre[-1].value["predictions"]])
+    trace2 = go.Scatter(
+        x=list(X_ice_pred),
+        y=list(Y_ice_pred),
+        name='Prediction',
+        mode='lines+markers'
+    )
+    return [{'data': [trace2], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_pred), max(X_ice_pred)]),
+                                                yaxis=dict(range=[min(Y_ice_pred), max(Y_ice_pred)]))}]
+"""
 
 if __name__=='__main__':
      #app.run_server(port=5000, debug=True)
      #app.run_server(host='0.0.0.0', port=5000, debug=True)
      app.run_server()
-"""
-# Create the graph with subplots
-    print("entering...")
-    mask_df = icesheet_df["Hemisphere"] == 'N'
-    north_df = icesheet_df[mask_df]
-    south_df = icesheet_df[~mask_df]
-
-    extension = north_df["Extent"].tolist()
-    years = north_df["Year"].tolist()
-    months = north_df["Month"].tolist()
-    days = north_df["Day"].tolist()
-    fig_heatmap = go.Figure(data=go.Heatmap(
-        x=months,
-        y=years,
-        z=extension,
-        type='heatmap',
-        colorscale='Viridis'))
-    return fig_heatmap"""

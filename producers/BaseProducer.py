@@ -54,7 +54,7 @@ class BaseProducer:
 
     def streaming_loop(self):
         go = True
-        pause = True
+        pause = False
         speed = 0  # 0 is full speed, speed is determined by number of milliseconds of timeout per iteration
 
         print("ice sheet processor ready on standby")
