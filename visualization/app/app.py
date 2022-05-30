@@ -51,7 +51,7 @@ def num_records(consum, n=1000):
     #         break
     records = consum.poll(n*5)
     multiple_streams = list(records.values())
-    multiple_streams = [stream.value for stream in multiple_streams]
+    multiple_streams = [stream.value for stream in multiple_streams[0]]
     return multiple_streams
 
     # try:
