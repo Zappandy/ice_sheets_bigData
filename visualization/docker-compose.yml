@@ -1,28 +1,17 @@
 version: '3.7'
-
 services:
+
   dashboard:
+    build: 
+      context: ./
     container_name: icesheetviz
     hostname: icesheetviz
-    healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost 80 || exit1" ]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-    build:
-      context: .
-      dockerfile: Dockerfile
     restart: always
     ports:
-            #- 5000:80
-       - 8080:80
+      - 5000:80
     networks:
       - default
-    environment:
-      - KAFKA_BROKER_URL=broker:29092
-      - LISTEN_TO_TOPICS=${ICE_SHEET_TOPIC}
-      - LISTENER_TIMEOUT=6000
-      - PROXY_ADDRESS_FORWARDING=true 
+    
 
       
 networks:
