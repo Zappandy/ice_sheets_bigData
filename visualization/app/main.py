@@ -1,20 +1,13 @@
-import datetime
-
-from dash.dependencies import Output, Input, State
-from kafka import KafkaConsumer
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 from flask import Flask
 import os, os.path, sys
-import json
-import pandas as pd
-from cassandra.cluster import Cluster
 import dash
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
+from kafka import KafkaConsumer
 
 sys.path.append(os.path.abspath('../'))
 # getting conection with cassandra
@@ -26,7 +19,8 @@ sys.path.append(os.path.abspath('../'))
 #session =  cluster.connect()
 
 server = Flask(__name__)
-app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
+#app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
+app = dash.Dash(server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = 'Icesheets_Dashboard'
 
 #session.set_keyspace(keyspace)
@@ -36,16 +30,16 @@ app.title = 'Icesheets_Dashboard'
 
 KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
 LISTEN_TO_TOPICS = os.environ.get("LISTEN_TO_TOPICS")
-LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
+#LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
 #TOPIC_NAME = os.environ.get("TOPIC_NAME")
 
 X_ice_extent = list()
 Y_ice_extent = list()
   
-consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
-                         bootstrap_servers=[KAFKA_BROKER_URL],
-                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
+#consumer = KafkaConsumer(LISTEN_TO_TOPICS, group_id="raw_streams",
+#                         bootstrap_servers=[KAFKA_BROKER_URL],
+#                         value_deserializer=lambda m: json.loads(m.decode('utf-8')))  # ocean and caribou?? where at
 
 def num_records(consum, n=1000):
     try:
@@ -76,19 +70,42 @@ def num_records(consum, n=1000):
 """
 
 
-app.layout = dbc.Container([
+#app.layout = dbc.Container([
+#
+#    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
+#    dbc.Row(dbc.Col(dcc.Loading(
+#        children=[dcc.Graph(id='north_extension', animate=True),
+#                  dcc.Interval(
+#                            id='interval-component',
+#                            interval=1*5000, # in milliseconds
+#                            n_intervals=0
+#                        )
+#                  ],
+#        style={'width': '49%', 'display': 'inline-block'})))
+#])
 
-    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
-    dbc.Row(dbc.Col(dcc.Loading(
-        children=[dcc.Graph(id='north_extension', animate=True),
-                  dcc.Interval(
-                            id='interval-component',
-                            interval=1*5000, # in milliseconds
-                            n_intervals=0
-                        )
-                  ],
-        style={'width': '49%', 'display': 'inline-block'})))
-])
+app.layout = html.Div(
+    children=[
+        html.H1(children="FreeBirds Crew"),
+        html.Div(children="""Docker Conatiner Running DASH WebApp"""),
+        dcc.Graph(
+            id="example-graph",
+            figure={
+                "data": [
+                    {"x": [1, 2, 3], "y": [4, 1, 2], "type": "bar", "name": "Like"},
+                    {
+                        "x": [1, 2, 3],
+                        "y": [2, 4, 5],
+                        "type": "bar",
+                        "name": "Comment",
+                    },
+                ],
+                "layout": {"title": "Like Vs Comment Dash Visualization"},
+            },
+        ),
+    ]
+)
+
 
 """
 dbc.Row(dbc.Col(dcc.Loading(
@@ -102,24 +119,24 @@ dbc.Row(dbc.Col(dcc.Loading(
 """
 
 # Multiple components can update everytime interval gets fired.
-@app.callback(Output('north_extension', 'figure'),
-              Input('interval-component', 'n_intervals'))
-def update_graph_live(n):
-    # kafka consumer goes here
-    new_data = num_records(consumer)
-    print(len(new_data))
-    X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
-    Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
-
-    trace1 = go.Scatter(
-        x=list(X_ice_extent),
-        y=list(Y_ice_extent),
-        name='Scatter',
-        mode='lines+markers'
-    )
-
-    return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
-                                                yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
+#@app.callback(Output('north_extension', 'figure'),
+#              Input('interval-component', 'n_intervals'))
+#def update_graph_live(n):
+#    # kafka consumer goes here
+#    new_data = num_records(consumer)
+#    print(len(new_data))
+#    X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
+#    Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
+#
+#    trace1 = go.Scatter(
+#        x=list(X_ice_extent),
+#        y=list(Y_ice_extent),
+#        name='Scatter',
+#        mode='lines+markers'
+#    )
+#
+#    return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
+                                                #yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
 
 """
 @app.callback(Output('north_preds', 'figure'),
@@ -141,4 +158,4 @@ def update_preds_live():
 if __name__=='__main__':
      #app.run_server(port=5000, debug=True)
      #app.run_server(host='0.0.0.0', port=5000, debug=True)
-     app.run_server()
+     server.run(host='0.0.0.0', port=80, debug=True)

@@ -14,13 +14,16 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-       - 5000:80
+            #- 5000:80
+       - 8080:80
     networks:
       - default
     environment:
       - KAFKA_BROKER_URL=broker:29092
       - LISTEN_TO_TOPICS=${ICE_SHEET_TOPIC}
       - LISTENER_TIMEOUT=6000
+      - PROXY_ADDRESS_FORWARDING=true 
+
       
 networks:
   default:
