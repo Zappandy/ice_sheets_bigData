@@ -1,5 +1,4 @@
 import datetime
-
 from dash.dependencies import Output, Input, State
 from kafka import KafkaConsumer
 import dash_bootstrap_components as dbc
@@ -18,20 +17,34 @@ from plotly.subplots import make_subplots
 
 sys.path.append(os.path.abspath('../'))
 # getting conection with cassandra
-# cluster = Cluster()
-# session = cluster.connect('cassandra-1')
+cluster = Cluster(['172.18.0.4'], control_connection_timeout=10, port=9042)
+session = cluster.connect()
+session.set_keyspace("icesheet_keyspace")
 
+def df_generator(cols, rows):
+        return pd.DataFrame(rows, columns=cols)
+
+
+session.row_factory = df_generator
+session.default_fetch_size = None
+
+ice_sheetrows = session.execute('SELECT * FROM icesheetreport;')
+ice_df = ice_sheetrows._current_rows
+caribou_sheetrows = session.execute('SELECT * FROM cariboureport;')
+caribou_df = caribou_sheetrows._current_rows
+oceanheat_sheetrows = session.execute('SELECT * FROM oceanheatreport;')
+oceanheat_df = oceanheat_sheetrows._current_rows
+globaltemp_sheetrows = session.execute('SELECT * FROM globaltempreport;')
+globaltemp_df = globaltemp_sheetrows._current_rows
 #keyspace = "icesheet_keyspace"
 #cluster = Cluster(['cassandra-1'])
 #session =  cluster.connect()
 
 server = Flask(__name__)
-app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
+#app = dash.Dash(server=server, external_stylesheets=[dbc.themes.FLATLY])
 app = dash.Dash(server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = 'Icesheets_Dashboard'
 
-#session.set_keyspace(keyspace)
-#session.execute('SELECT * FROM icesheetreport')
 
 # stream connections for predictions and visualizations
 
@@ -62,11 +75,6 @@ def num_records(consum, n=1000):
         print("communicating with streams...")
     return multiple_streams
 
-# define a key
-# icesheet_df = pd.DataFrame.from_records(num_records(consumer))
-
-# heatmap = px.imshow([extension])
-#print(icesheet_df.head(10))
 
 """if icesheet_df.empty:
     print("can't enter yet...")
@@ -109,8 +117,15 @@ def update_graph_live(n):
     # kafka consumer goes here
     new_data = num_records(consumer)
     print(len(new_data))
-    X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
-    Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
+    if len(new_data) == 0:
+        cols=["Year", "Month", "Day"]
+        ice_df["Date"] = ice_df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
+        ice_df["Date"]= pd.to_datetime(ice_df["Date"])
+        X_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Date"].values.tolist()
+        Y_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Extent"].values.tolist()
+    else:
+        X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
+        Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
 
     trace1 = go.Scatter(
         x=list(X_ice_extent),
