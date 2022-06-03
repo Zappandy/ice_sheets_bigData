@@ -14,6 +14,7 @@ import dash
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
+from collections import deque
 
 
 sys.path.append(os.path.abspath('../'))
@@ -32,11 +33,17 @@ session.default_fetch_size = None
 ice_sheetrows = session.execute('SELECT * FROM icesheetreport;')
 ice_df = ice_sheetrows._current_rows
 caribou_sheetrows = session.execute('SELECT * FROM cariboureport;')
-caribou_df = caribou_sheetrows._current_rows
+raw_caribou_df = caribou_sheetrows._current_rows
 oceanheat_sheetrows = session.execute('SELECT * FROM oceanheatreport;')
 oceanheat_df = oceanheat_sheetrows._current_rows
 globaltemp_sheetrows = session.execute('SELECT * FROM globaltempreport;')
 globaltemp_df = globaltemp_sheetrows._current_rows
+
+caribou_df = raw_caribou_df.interpolate(method='pad', order=2) #interpolating and dropping na
+caribou_df.dropna(inplace=True)
+
+#globaltemp viz
+fig_globaltemp = px.scatter(globaltemp_df, x="year", y=round(globaltemp_df["lowess_smoothing"],3), color = 'lowess_smoothing')
 #keyspace = "icesheet_keyspace"
 #cluster = Cluster(['cassandra-1'])
 #session =  cluster.connect()
@@ -74,17 +81,43 @@ def num_records(consum, n=1000):
         print("communicating with streams...")
     return multiple_streams
 
+cols=["Year", "Month", "Day"]
+ice_df["Date"] = ice_df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
+ice_df["Date"]= pd.to_datetime(ice_df["Date"]).astype(str)
+#X_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Date"]
+#Y_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Extent"]
+all_north_dates = ice_df[ice_df["Hemisphere"] == 'N']["Date"].values.tolist()
+all_north_extent = ice_df[ice_df["Hemisphere"] == 'N']["Extent"].values.tolist()
+
+
 app.layout = dbc.Container([
 
     dbc.Row(
         dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
     dbc.Row(
-        dbc.Col([dcc.Graph(id="north_extension", animate=True),
+        dbc.Col([dcc.Graph(id="north_extension",  animate=True),
                  dcc.Interval(id="interval-component",
-                              interval=1*5000,
+                              interval=5*1000,
                               n_intervals=0)
-                 ]), style={"width": "49%", "display": "inline-block"}
-        )
+                 ]) 
+        ),
+    dbc.Row(
+        dbc.Col(
+            [
+            dcc.Dropdown(id="location-dropdown",
+            options=[{"label": i, "value": i} for i in caribou_df["location"].unique()],
+            value="Central Arctic"), dcc.Graph(id="caribou_graph") 
+            ])
+            ),
+
+    dbc.Row(
+        dbc.Col(
+            [
+            dcc.Graph(figure=fig_globaltemp, animate=True)])
+            )
+
+                            #html.H4(children='Global Heat Temperature', style={'textAlign': 'center', 'color': 'red', 'fontSize': 25}),
+                            #    dcc.Graph(figure=fig_globaltemp, animate=True)
 
     #dbc.Row(dbc.Col(dcc.Loading(
     #    children=[dcc.Graph(id='north_extension', animate=True),
@@ -96,13 +129,6 @@ app.layout = dbc.Container([
     #              ],
     #    style={'width': '49%', 'display': 'inline-block'})))
 
-    #dbc.Row(dbc.Col([
-    #    children='Caribou population change over the years',
-    #    style={'textAlign': 'center', 'color': 'blue', 'fontSize': 25},
-    #    dcc.Dropdown(id='location-dropdown', 
-    #    options=[{'label': i, 'value': i} for i in caribou_dfu['location'].unique()],
-    #    value='Central Arctic'), dcc.Graph(id='caribou_graph')])
-    #        ),
 ])
 
 """
@@ -122,31 +148,47 @@ dbc.Row(dbc.Col(dcc.Loading(
 #              [Input('interval-component', 'n_intervals'),
 #		   Input(component_id='location-dropdown', component_property='value')])
 
+@app.callback(Output(component_id='caribou_graph', component_property='figure'),
+              Input(component_id='location-dropdown', component_property='value'))
+def update_graph(selected_location):
+    filtered_geo = caribou_df[caribou_df['location'] == selected_location]
+    line_fig = px.scatter(filtered_geo, x=filtered_geo['Year'], y=filtered_geo['population_count'],
+                          size=filtered_geo['population_count'], hover_name=filtered_geo["location"],
+                          title=f'Caribou population in {selected_location}')
+    return line_fig
+
+
+
 @app.callback(Output('north_extension', 'figure'),
-              Input('interval-component', 'n_intervals'))
+              [Input('interval-component', 'n_intervals')])
 def update_graph_live(n):
     # kafka consumer goes here
-    new_data = num_records(consumer)
-    print(type(new_data))
-    print(len(new_data))
-    if len(new_data) == 0:
-        print("tito is here now")
-        cols=["Year", "Month", "Day"]
-        ice_df["Date"] = ice_df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
-        ice_df["Date"]= pd.to_datetime(ice_df["Date"])
-        X_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Date"].values.tolist()
-        Y_ice_extent = ice_df[ice_df["Hemisphere"] == 'N']["Extent"].values.tolist()
-    else:
-        X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
-        Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
 
+    new_data = num_records(consumer)
+    X_ice_extent = []
+    Y_ice_extent = []
+    for i in range(565):
+        X_ice_extent.append(all_north_dates[i])
+        Y_ice_extent.append(all_north_extent[i])
+
+    #if len(new_data) > 0:
+    #    X_ice_extent.extend([datetime.date(d["Year"], d["Month"], d["Day"]) for d in new_data if d["Hemisphere"] == "N"])
+    #    Y_ice_extent.extend([d["Extent"] for d in new_data if d["Hemisphere"] == "N"])
+
+
+    fig = go.Figure()
     trace1 = go.Scatter(
-        x=list(X_ice_extent),
-        y=list(Y_ice_extent),
+        x=X_ice_extent,
+        y=Y_ice_extent,
         name='Scatter',
-        mode='lines+markers'
+        mode='markers'
     )
-    return go.Figure(data=[trace1])
+    fig.add_trace(trace1)
+    fig.update_xaxes(range=[min(X_ice_extent), max(X_ice_extent)])
+    fig.update_yaxes(range=[min(Y_ice_extent), max(Y_ice_extent)])
+    return fig
+
+
     #return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
     #                                            yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
 
