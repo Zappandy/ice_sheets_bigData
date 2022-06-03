@@ -37,6 +37,9 @@ docker-compose -f consumers/caribou_split_processor/docker-compose.yml up -d
 docker-compose -f consumers/ice_sheets_predictor/docker-compose.yml up -d
 docker-compose -f manual_cass_sinks/docker-compose.yml up -d
 docker-compose -f producers/docker-compose.yml up -d
+docker-compose -f visualization/docker-compose.yml --env-file .env up -d
+visit...
+127.0.0.1:5000
 ```
 
 The producers start streaming messages immediately on startup.
