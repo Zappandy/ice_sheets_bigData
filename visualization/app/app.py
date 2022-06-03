@@ -12,6 +12,7 @@ import pandas as pd
 from cassandra.cluster import Cluster
 import dash
 import plotly.graph_objects as go
+import plotly.express as px
 from plotly.subplots import make_subplots
 
 
@@ -52,8 +53,6 @@ KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
 LISTEN_TO_TOPICS = os.environ.get("LISTEN_TO_TOPICS")
 LISTENER_TIMEOUT = int(os.environ.get("LISTENER_TIMEOUT"))
 
-#TOPIC_NAME = os.environ.get("TOPIC_NAME")
-
 X_ice_extent = list()
 Y_ice_extent = list()
   
@@ -75,28 +74,35 @@ def num_records(consum, n=1000):
         print("communicating with streams...")
     return multiple_streams
 
-
-"""if icesheet_df.empty:
-    print("can't enter yet...")
-
-    icesheet_df = pd.DataFrame.from_dict({"Hemisphere": ['N', 'S'], "Year": [0, 0],
-                                          "Month": [0, 0], "Day": [0, 0],
-                                          "Extent": [0.0, 0.0], "Missing": [0.0, 0.0]})
-"""
-
-
 app.layout = dbc.Container([
 
-    dbc.Row(dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
-    dbc.Row(dbc.Col(dcc.Loading(
-        children=[dcc.Graph(id='north_extension', animate=True),
-                  dcc.Interval(
-                            id='interval-component',
-                            interval=1*5000, # in milliseconds
-                            n_intervals=0
-                        )
-                  ],
-        style={'width': '49%', 'display': 'inline-block'})))
+    dbc.Row(
+        dbc.Col(html.H2("Icesheet Dashboard"), width={'size': 12, 'offset': 0, 'order': 0}), style={'textAlign': 'center', 'paddingBottom': '1%'}),
+    dbc.Row(
+        dbc.Col([dcc.Graph(id="north_extension", animate=True),
+                 dcc.Interval(id="interval-component",
+                              interval=1*5000,
+                              n_intervals=0)
+                 ]), style={"width": "49%", "display": "inline-block"}
+        )
+
+    #dbc.Row(dbc.Col(dcc.Loading(
+    #    children=[dcc.Graph(id='north_extension', animate=True),
+    #              dcc.Interval(
+    #                        id='interval-component',
+    #                        interval=1*5000, # in milliseconds
+    #                        n_intervals=0
+    #                    )
+    #              ],
+    #    style={'width': '49%', 'display': 'inline-block'})))
+
+    #dbc.Row(dbc.Col([
+    #    children='Caribou population change over the years',
+    #    style={'textAlign': 'center', 'color': 'blue', 'fontSize': 25},
+    #    dcc.Dropdown(id='location-dropdown', 
+    #    options=[{'label': i, 'value': i} for i in caribou_dfu['location'].unique()],
+    #    value='Central Arctic'), dcc.Graph(id='caribou_graph')])
+    #        ),
 ])
 
 """
@@ -111,13 +117,20 @@ dbc.Row(dbc.Col(dcc.Loading(
 """
 
 # Multiple components can update everytime interval gets fired.
+#@app.callback([Output('north_extension', 'figure'),
+#		   Output(component_id='caribou_graph', component_property='figure')],
+#              [Input('interval-component', 'n_intervals'),
+#		   Input(component_id='location-dropdown', component_property='value')])
+
 @app.callback(Output('north_extension', 'figure'),
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):
     # kafka consumer goes here
     new_data = num_records(consumer)
+    print(type(new_data))
     print(len(new_data))
     if len(new_data) == 0:
+        print("tito is here now")
         cols=["Year", "Month", "Day"]
         ice_df["Date"] = ice_df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
         ice_df["Date"]= pd.to_datetime(ice_df["Date"])
@@ -133,9 +146,12 @@ def update_graph_live(n):
         name='Scatter',
         mode='lines+markers'
     )
+    return go.Figure(data=[trace1])
+    #return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
+    #                                            yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
 
-    return [{'data': [trace1], 'layout': go.Layout(xaxis=dict(range=[min(X_ice_extent), max(X_ice_extent)]),
-                                                yaxis=dict(range=[min(Y_ice_extent), max(Y_ice_extent)]))}]
+
+
 
 """
 @app.callback(Output('north_preds', 'figure'),
